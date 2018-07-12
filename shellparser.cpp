@@ -13,8 +13,11 @@
 #include "db_cxx.h"
 #include "SQLParser.h"
 #include "sqlhelper.h"
+#include "heap_storage.h"
 using namespace std;
 using namespace hsql;
+
+DbEnv* _DB_ENV;
 
 // The Parser class itself
 class DBParser{
@@ -280,7 +283,8 @@ int main(){
 		env.set_message_stream(&cout);
 		env.set_error_stream(&cerr);
 		env.open(envdir.c_str(), DB_CREATE | DB_INIT_MPOOL, 0);
-		Db db(&env, 0);
+		_DB_ENV = &env;
+		//Db db(&env, 0);
 
 		// Receive SQLstatement by shell
 		string SQLStatement;
@@ -288,6 +292,11 @@ int main(){
 		getline(cin, SQLStatement);
 		if (SQLStatement == "quit")
 			break;
+		
+		if (SQLStatement == "test") {
+			cout << test_heap_storage() << endl;
+			continue;
+		}
 		// Print the parsed sql
 		cout << dbParser.executeSQL(SQLStatement) << endl;
 	}
