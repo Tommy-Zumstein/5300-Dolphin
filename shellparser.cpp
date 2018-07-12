@@ -277,6 +277,8 @@ int main(){
 		string home = getenv("HOME");
 		string envdir = string(home) + "/" + HOME;
 		DbEnv env(0U);
+		env.set_message_stream(&cout);
+		env.set_error_stream(&cerr);
 		env.open(envdir.c_str(), DB_CREATE | DB_INIT_MPOOL, 0);
 		Db db(&env, 0);
 
