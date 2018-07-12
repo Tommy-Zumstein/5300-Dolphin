@@ -4,12 +4,10 @@ COURSE      = /usr/local/db6
 INCLUDE_DIR = $(COURSE)/include
 LIB_DIR     = $(COURSE)/lib
 
-OBJS       = shellparser.o heap_storage.o
-
-shellparser: $(OBJS)
-	g++ -L$(LIB_DIR) -o $@ $(OBJS) -ldb_cxx -lsqlparser
-shellparser.o : heap_storage.h storage_engine.h
-heap_storage.o : heap_storage.h storage_engine.h
+OBJS       = shellparser.o
 
 %.o: %.cpp
 	g++ -I$(INCLUDE_DIR) $(CCFLAGS) -o "$@" "$<"
+
+shellparser: $(OBJS)
+	g++ -L$(LIB_DIR) -o $@ $< -ldb_cxx -lsqlparser
