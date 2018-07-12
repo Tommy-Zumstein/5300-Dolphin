@@ -21,8 +21,8 @@ class DBParser{
 public:
 	/**
 	* Parse TABLE REF INFO
-	* @param TableRef *table
-	* @returns     string
+	* @param	TableRef *table
+	* @return	string
 	*/
 	string printTableRefInfo(TableRef *table){
 		string tableref;
@@ -74,8 +74,8 @@ public:
 
 	/**
 	* Parse OPERATOR Expression
-	* @param Expr *expr
-	* @returns     string
+	* @param	Expr *expr
+	* @return	string
 	*/
 	string printOperatorExpression(Expr *expr){
 		string operatorExpression;
@@ -100,6 +100,7 @@ public:
 		default:
 			break;
 		}
+		// Right-hand side of expression
 		if (expr->expr2 != nullptr){
 			operatorExpression += " " + printExpression(expr->expr2);
 		}
@@ -108,8 +109,8 @@ public:
 
 	/**
 	* Parse expression
-	* @param Expr *expr
-	* @returns     string
+	* @param	Expr *expr
+	* @return	string
 	*/
 	string printExpression(Expr *expr){
 		string expression;
@@ -153,8 +154,8 @@ public:
 
 	/**
 	* Parse the COLUMN DEFINITION
-	* @param const ColumnDefinition *col
-	* @returns     string
+	* @param	const ColumnDefinition *col
+	* @return	string
 	*/
 	string columnDefinitionToString(const ColumnDefinition *col){
 		string columnDef(col->name);
@@ -177,8 +178,8 @@ public:
 
 	/**
 	* Parse the CREATE statement
-	* @param Selectstatement *stmt
-	* @returns     string
+	* @param	Selectstatement *stmt
+	* @return	string
 	*/
 	string executeCreateStatement(const CreateStatement *stmt){
 		string statement = "CREATE TABLE ";
@@ -196,8 +197,8 @@ public:
 
 	/**
 	* Parse the SELECT statement
-	* @param Selectstatement *stmt
-	* @returns     string
+	* @param	Selectstatement *stmt
+	* @return	string
 	*/
 	string executeSelectStatement(const SelectStatement *stmt){
 		string statement = "SELECT ";
@@ -231,8 +232,8 @@ public:
 
 	/**
 	* (temp) Parse an SQL statement
-	* @param stmt  Hyrise AST for the statement
-	* @returns     string of the parsed SQL
+	* @param	stmt, Hyrise AST for the statement
+	* @return	string, the parsed SQL
 	*/
 	string executeStatement(const SQLStatement *stmt){
 		switch (stmt->type()){
@@ -247,8 +248,8 @@ public:
 
 	/**
 	* (temp) receives an SQL statement
-	* @param SQLStatement  String with the input
-	* @returns     string of the parsed SQL
+	* @param	SQLStatement, String with the input
+	* @return	string, the parsed SQL
 	*/
 	string executeSQL(string SQLStatement){
 		string output;
@@ -266,8 +267,8 @@ public:
 
 /**
 * Main function, the entry point of the program
-* @param null
-* @returns     int
+* @param	null
+* @return	int
 */
 int main(){
 	const string HOME = "cpsc5300/data";
