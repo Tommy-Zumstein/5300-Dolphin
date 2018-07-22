@@ -29,6 +29,7 @@ typedef std::vector<RecordID> RecordIDs;
 typedef std::length_error DbBlockNoRoomError;
 
 /**
+ * FIXME: Different from solution
  * @class DbBlockError - generic exception class for DbBlock
  */
 class DbBlockError : public std::runtime_error {
@@ -37,9 +38,9 @@ public:
 };
 
 /**
- * @class DbBlock - abstract base class for blocks in our database files 
+ * @class DbBlock - abstract base class for blocks in our database files
  * (DbBlock's belong to DbFile's.)
- * 
+ *
  * Methods for putting/getting records in blocks:
  * 	initialize_new()
  * 	add(data)
@@ -56,16 +57,17 @@ class DbBlock {
 public:
 	/**
 	 * our blocks are 4kB
-	 */ 
+	 */
 	static const uint BLOCK_SZ = 4096;
 
 	/**
 	 * ctor/dtor (subclasses should handle the big-5)
-	 */ 
+	 */
 	DbBlock(Dbt &block, BlockID block_id, bool is_new=false) : block(block), block_id(block_id) {}
 	virtual ~DbBlock() {}
 
 	/**
+	 * FIXME: Different from solution
 	 * Reinitialize this block to an empty new block.
 	 */
 	virtual void initialize_new() {}
@@ -79,6 +81,7 @@ public:
 	virtual RecordID add(const Dbt* data) throw(DbBlockNoRoomError) = 0;
 
 	/**
+	 * FIXME: Different from solution
 	 * Get a record from this block.
 	 * @param record_id  which record to fetch
 	 * @returns          the data stored for the given record
@@ -86,10 +89,11 @@ public:
 	virtual Dbt* get(RecordID record_id) throw(DbBlockError) = 0;
 
 	/**
+	 * FIXME: Different from solution
 	 * Change the data stored for a record in this block.
 	 * @param record_id  which record to update
 	 * @param data       the new data to store for the given record
-	 * @throws           DbBlockNoRoomError if insufficient room in the block 
+	 * @throws           DbBlockNoRoomError if insufficient room in the block
 	 *                   (old record is retained)
 	 */
 	virtual void put(RecordID record_id, const Dbt &data) throw(DbBlockNoRoomError, DbBlockError) = 0;
@@ -103,13 +107,13 @@ public:
 	/**
 	 * Get all the record ids in this block (excluding deleted ones).
 	 * @returns  pointer to list of record ids (freed by caller)
-	 */ 
+	 */
 	virtual RecordIDs* ids() = 0;
 
 	/**
 	 * Access the whole block's memory as a BerkeleyDB Dbt pointer.
 	 * @returns  Dbt used by this block
-	 */ 
+	 */
 	virtual Dbt* get_block() {return &block;}
 
 	/**
@@ -151,7 +155,7 @@ public:
 
 	/**
 	 * Create the file.
-	 */	
+	 */
 	virtual void create() = 0;
 
 	/**
@@ -192,7 +196,7 @@ public:
 	 * Get a list of all the valid BlockID's in the file
 	 * FIXME - not a good long-term approach, but we'll do this until we put in iterators
 	 * @returns  a pointer to vector of BlockIDs (freed by caller)
-	 */ 
+	 */
 	virtual BlockIDs* block_ids() = 0;
 
 protected:
@@ -254,15 +258,15 @@ public:
 
 /**
  * @class DbRelation - top-level object handling a physical database relation
- * 
+ *
  * Methods:
  * 	create()
  * 	create_if_not_exists()
  * 	drop()
- * 	
+ *
  * 	open()
  * 	close()
- * 	
+ *
  *	insert(row)
  *	update(handle, new_values)
  *	del(handle)
@@ -328,7 +332,7 @@ public:
 	 * where handle is sufficient to identify one specific record (e.g, returned
 	 * from an insert or select).
 	 * @param handle   the row to delete
-	 */ 
+	 */
 	virtual void del(const Handle handle) = 0;
 
 	/**
@@ -352,7 +356,7 @@ public:
 	virtual ValueDict* project(Handle handle) = 0;
 
 	/**
-	 * Return a sequence of values for handle given by column_names 
+	 * Return a sequence of values for handle given by column_names
 	 * (SELECT <column_names>).
 	 * @param handle        row to get values from
 	 * @param column_names  list of column names to project
@@ -360,9 +364,17 @@ public:
 	 */
 	virtual ValueDict* project(Handle handle, const ColumnNames* column_names) = 0;
 
+	/**
+	 * Return a sequence of values for handle given by column_names (from dictionary)
+	 * (SELECT <column_names>).
+	 * @param handle        row to get values from
+	 * @param column_names  list of column names to project (taken from keys of dict)
+	 * @returns             dictionary of values from row (keyed by column_names)
+	 */
+	 virtual ValueDict* project(Handle handle, const ValueDict* column_names);
+
 protected:
 	Identifier table_name;
 	ColumnNames column_names;
 	ColumnAttributes column_attributes;
 };
-

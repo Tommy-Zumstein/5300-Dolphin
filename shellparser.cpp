@@ -1,19 +1,23 @@
 /**
 * @CPSC5300 Milestone 1: Skeleton
-*           Milestone 2: Data block
+*           Milestone 2: Rudimentary Storage Engine
+*           Milestone 3: Schema Storage
 * @File: shellparser.cpp - main entry for the relation manager's SQL shell
 * @Group: Dolphin
-* @Author: Natalia Manriquez, Siyao Xu
+* @Author: Wonseok Seo, Kevin Cushing - advised from Kevin Lundeen
+* @see "Seattle University, cpsc5300, Summer 2018"
 */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <cstring>
+#include <iostream>
+#include <string>
 #include <cassert>
 #include "db_cxx.h"
 #include "SQLParser.h"
-#include "sqlhelper.h"
-#include "heap_storage.h"
+#include "ParseTreeToString.h"
+#include "SQLExec.h"
 using namespace std;
 using namespace hsql;
 
@@ -273,32 +277,56 @@ public:
 * @param	null
 * @return	int
 */
-int main(){
-	const string HOME = "cpsc5300/data";
-	DBParser dbParser;
-	// Initialize dbenv
-	string home = getenv("HOME");
-	string envdir = string(home) + "/" + HOME;
-	DbEnv env(0U);
-	env.set_message_stream(&cout);
-	env.set_error_stream(&cerr);
-	env.open(envdir.c_str(), DB_CREATE | DB_INIT_MPOOL, 0);
-	_DB_ENV = &env;
-	//Db db(&env, 0);
-	while(true){
-		// Receive SQLstatement by shell
-		string SQLStatement;
-		cout << "SQL> ";
-		getline(cin, SQLStatement);
-		if (SQLStatement == "quit")
-			break;
-		
-		if (SQLStatement == "test") {
-			cout << test_heap_storage() << endl;
-			continue;
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+		    cerr << "Usage: cpsc5300: dbenvpath" << endl;
+				return 1;
 		}
-		// Print the parsed sql
-		cout << dbParser.executeSQL(SQLStatement) << endl;
-	}
-	return 0;
+	  char* envHome = argv[1];
+		cout << "(sql5300: running with database environment at " << envHome << ")" << endl;
+		DBParser dbParser;
+		// Initialize dbenv
+		DbEnv env(0U);
+		env.set_message_stream(&cout);
+		env.set_error_stream(&cerr);
+		try {
+				env.open(envHome, DB_CREATE | DB_INIT_MPOOL, 0);
+		} catch (DbException &exc) {
+				cerr << "(sql5300: " << exc.what() << ")" << endl;
+				exit(1);
+		}
+		_DB_ENV = &env;
+		initialize_schema_tables();
+		//Db db(&env, 0);
+		while(true){
+				// Receive SQLstatement by shell
+				string query;
+				cout << "SQL> ";
+				getline(cin, query);
+				if (query == "quit")
+						break;
+				if (query == "test") {
+						cout << "test_heap_storage: " << (test_heap_storage() ? "ok" : "failed") << endl;
+						continue;
+				}
+				SQLPArserResult* parse = SQLParser::parseSQLString(query);
+				if (!parse->isValie()) {
+						cout << "invalid SQL: " << query << endl;
+						cout << parse->errorMsg() << endl;
+				} else {
+						for (uint i = 0; i < parse->size(); i++) {
+								const SQLStatement *statement = parse->getStatement(i);
+								try {
+										cout << dbParser.executeSQL(query) << endl;
+										QueryResult *result - SQLExec::execute(statement);
+										cout << *result << endl;
+										delete result;
+								} catch (SQLExecError& e) {
+										cout << "Error: " << e.what() << endl;
+								}
+						}
+				}
+				delete parse;
+		}
+		return 0;
 }
