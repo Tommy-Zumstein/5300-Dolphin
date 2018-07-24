@@ -90,10 +90,10 @@ void SQLExec::column_definition(const ColumnDefinition *col,
     // for now, we only have two data types, INT and TEXT
     switch (col->type) {
         case ColumnDefinition::INT:
-            column_attribute.set_data_type(ColumnDefinition::INT);
+            column_attribute.set_data_type(ColumnAttribute::INT);
             break;
         case ColumnDefinition::TEST:
-            column_attribute.set_data_type(ColumnDefinition::TEST);
+            column_attribute.set_data_type(ColumnAttribute::TEXT);
             break;
         default:
             throw SQLExecError("not implemented");
@@ -152,7 +152,7 @@ QueryResult *SQLExec::create(const CreateStatement *statement) {
             if (statement->ifNotExists)
                 table.create_if_not_exists();
             else
-                table.crete();
+                table.create();
         } catch (exception& e) {
             // delete all column values in column schema
             try {
@@ -178,10 +178,10 @@ QueryResult *SQLExec::drop(const DropStatement *statement) {
         throw SQLExecError("unrecognized DROP type");
 
     // to hold table name from statment
-    Identifier table_name = statment->name;
+    Identifier table_name = statement->name;
     // validate attempt to drop schema tables
     if (table_name == Tables::TABLE_NAME || table_name == Columns::TABLE_NAME)
-        throw SQLExecError("cannot drop a schema table")
+        throw SQLExecError("cannot drop a schema table");
 
     // to hold target location
     ValudeDict target;
@@ -242,7 +242,7 @@ QueryResult *SQLExec::show_tables() {
     ValueDicts* rows = new ValueDicts;
     for (auto const& handle: *handles) {
         ValueDict* row = SQLExec::tables->project(handle, name_key);
-        Identifier table_name = row->at("table_name".s);
+        Identifier table_name = row->at("table_name").s;
         // validation to exclude schema tables
         if (table_name != Tables::TABLE_NAME &&
             table_name != Columns::TABLE_NAME)
