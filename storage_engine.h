@@ -108,7 +108,7 @@ public:
 	 * Get all the record ids in this block (excluding deleted ones).
 	 * @returns  pointer to list of record ids (freed by caller)
 	 */
-	virtual RecordIDs* ids() = 0;
+	virtual RecordIDs* ids() const = 0;
 
 	/**
 	 * Access the whole block's memory as a BerkeleyDB Dbt pointer.
