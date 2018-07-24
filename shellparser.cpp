@@ -332,10 +332,10 @@ int main(int argc, char *argv[]) {
 		DBParser dbParser;
 		// Initialize dbenv
 		DbEnv *env = new DbEnv(0U);
-		env.set_message_stream(&cout);
-		env.set_error_stream(&cerr);
+		env->set_message_stream(&cout);
+		env->set_error_stream(&cerr);
 		try {
-				env.open(envHome, DB_CREATE | DB_INIT_MPOOL, 0);
+				env->open(envHome, DB_CREATE | DB_INIT_MPOOL, 0);
 		} catch (DbException &exc) {
 				cerr << "(sql5300: " << exc.what() << ")" << endl;
 				exit(1);
