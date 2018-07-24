@@ -92,7 +92,7 @@ void SQLExec::column_definition(const ColumnDefinition *col,
         case ColumnDefinition::INT:
             column_attribute.set_data_type(ColumnAttribute::INT);
             break;
-        case ColumnDefinition::TEST:
+        case ColumnDefinition::TEXT:
             column_attribute.set_data_type(ColumnAttribute::TEXT);
             break;
         default:
@@ -138,9 +138,9 @@ QueryResult *SQLExec::create(const CreateStatement *statement) {
             // insert each column name and type into columns schema
             for (uint i = 0; i < column_names.size(); i++) {
                 row["column_name"] = column_names[i];
-                if (column_attributes[i].get_data_type() == "INT") {
+                if (column_attributes[i].get_data_type() == ColumnAttribute::INT) {
                     row["data_type"] = Value("INT");
-                } else if (column_attributes[i].get_data_type() == "TEXT"){
+                } else if (column_attributes[i].get_data_type() == ColumnAttribute::TEXT){
                     row["data_type"] = Value("TEXT");
                 }
                 // insert each handle to temporally column handles vector
@@ -184,7 +184,7 @@ QueryResult *SQLExec::drop(const DropStatement *statement) {
         throw SQLExecError("cannot drop a schema table");
 
     // to hold target location
-    ValudeDict target;
+    ValueDict target;
     target["table_name"] = Value(table_name);
 
     // get the table
