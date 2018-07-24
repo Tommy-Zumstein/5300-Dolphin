@@ -230,7 +230,7 @@ QueryResult *SQLExec::show_tables() {
 
     // to hold attribute TEXT
     ColumnAttributes* attribute_key = new ColumnAttributes;
-    attribute_key->push_back(ColumnAttribute(ColumnAttribtue::TEXT));
+    attribute_key->push_back(ColumnAttribute(ColumnAttribute::TEXT));
 
     // to hold all tables handles
     Handles* handles = SQLExec::tables->select();
