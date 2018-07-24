@@ -579,7 +579,7 @@ ValueDict *HeapTable::project(Handle handle, const ColumnNames *column_names){
             if (row->find(column_name) != row->end()) {
                 result->insert(std::pair<Identifier, Value>(column_name, row->at(column_name)));
             } else { // thow exception added (sprint 2)
-              throw DbRelationError("table does not have column named ''" + column_name + "'");
+                throw DbRelationError("table does not have column named ''" + column_name + "'");
             }
         }
     }
