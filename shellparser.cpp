@@ -27,7 +27,7 @@ DbEnv* _DB_ENV;
 class DBParser{
 
 public:
-const vector<string> reserved_words = {
+static const vector<string> reserved_words = {
 "COLUMNS", "SHOW", "TABLES",
 "ADD","ALL","ALLOCATE","ALTER","AND","ANY","ARE","ARRAY","AS","ASENSITIVE","ASYMMETRIC","AT",
                   "ATOMIC","AUTHORIZATION","BEGIN","BETWEEN","BIGINT","BINARY","BLOB","BOOLEAN","BOTH","BY","CALL",
