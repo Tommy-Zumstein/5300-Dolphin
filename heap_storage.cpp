@@ -13,7 +13,7 @@
 #include "heap_storage.h"
 using namespace std;
 
-typedef u_int16_t u16;
+typedef uint16_t u16;
 
 /************************************************
  *  Implementation of abstract class SlottedPage
@@ -638,7 +638,7 @@ Dbt *HeapTable::marshal(const ValueDict *row) const {
             if (size > UINT16_MAX)
                 throw DbRelationError("text field too long to marshal");
             if (offset + 2 + size > DbBlock::BLOCK_SZ)
-                throw DbRelationError("row too big to marshal")
+                throw DbRelationError("row too big to marshal");
             *(u16*) (bytes + offset) = size;
             offset += sizeof(u16);
             memcpy(bytes + offset, value.s.c_str(), size);    // Assume ascii
