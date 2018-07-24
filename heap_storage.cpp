@@ -504,6 +504,7 @@ void HeapTable::del(const Handle handle){
  * @return  Handles*
  */
 Handles *HeapTable::select(){
+    open();
     Handles *handles = new Handles();
     BlockIDs *block_ids = file.block_ids();
     for (auto const &block_id : *block_ids) {
