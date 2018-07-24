@@ -59,10 +59,7 @@ RecordID SlottedPage::add(const Dbt *data) throw(DbBlockNoRoomError){
  * @return  Dbt*
  * @Author sprint 1 group
  */
-Dbt *SlottedPage::get(RecordID record_id) throw(DbBlockError){
-    if (!have_record(record_id))
-        throw DbBlockError("Record not found");
-
+Dbt *SlottedPage::get(RecordID record_id) const {
     u16 size = 0;
     u16 loc = 0;
     this->get_header(size, loc, record_id);
@@ -162,7 +159,7 @@ RecordIDs *SlottedPage::ids(void) const {
 
 // Check if the record exists based on the record id
 // Author   sprint 1 group
-bool SlottedPage::have_record(RecordID record_id){
+bool SlottedPage::have_record(RecordID record_id) const {
     if (record_id == 0 || record_id > this->num_records)
         return false;
 
@@ -179,7 +176,7 @@ bool SlottedPage::have_record(RecordID record_id){
 
 // Set the header values from a record
 // @author  Kevin Lundeen
-void SlottedPage::get_header(u16 &size, u16 &loc, RecordID id){
+void SlottedPage::get_header(u16 &size, u16 &loc, RecordID id) const {
     size = get_n(4 * id);
     loc = get_n(4 * id + 2);
 }
@@ -196,7 +193,7 @@ void SlottedPage::put_header(RecordID id, u16 size, u16 loc){
 }
 
 // Check if there is enough room
-bool SlottedPage::has_room(u16 size){
+bool SlottedPage::has_room(u16 size) const {
     return 4 * this->num_records + 3 < this->end_free - size + 1;
 }
 
@@ -238,7 +235,7 @@ void SlottedPage::slide(RecordID start_record_id, u16 offset, bool left){
 }
 
 // Get 2-byte integer at given offset in block.
-u16 SlottedPage::get_n(u16 offset){
+u16 SlottedPage::get_n(u16 offset) const {
     return *(u16 *)this->address(offset);
 }
 
@@ -248,18 +245,18 @@ void SlottedPage::put_n(u16 offset, u16 n){
 }
 
 // Make a void* pointer for a given offset into the data block.
-void *SlottedPage::address(u16 offset){
+void *SlottedPage::address(u16 offset) const {
     return (void *)((char *)this->block.get_data() + offset);
 }
 
-void SlottedPage::ensure_record_exist(RecordID record_id) throw (DbBlockError){
-	if (!have_record(record_id)){
-		std::ostringstream string_stream;
-		string_stream << "Record not found with id: " << record_id;
-
-		throw DbBlockError(string_stream.str());
-	}
-}
+// void SlottedPage::ensure_record_exist(RecordID record_id) throw (DbBlockError){
+// 	if (!have_record(record_id)){
+// 		std::ostringstream string_stream;
+// 		string_stream << "Record not found with id: " << record_id;
+//
+// 		throw DbBlockError(string_stream.str());
+// 	}
+// }
 
 /************************************************
  *  Implementation of class HeapFile
@@ -372,7 +369,7 @@ void HeapFile::put(DbBlock *block){
  * @param   void
  * @return  BlockIDs*
  */
-BlockIDs *HeapFile::block_ids(){
+BlockIDs *HeapFile::block_ids() const {
     BlockIDs *ids = new BlockIDs();
     for (BlockID i = 1; i <= this->last; i++){
         ids->push_back(i);
@@ -388,7 +385,7 @@ uint32_t HeapFile::get_block_count() {
 }
 
 // Open the database file, and set dbenv parameters
-void HeapFile::db_open(uint flags){
+void HeapFile::db_open(uint flags) {
     if (!this->closed){
         return;
     }
@@ -473,7 +470,7 @@ void HeapTable::close(){
  * @param   void
  * @return  Handle
  */
-Handle HeapTable::insert(const ValueDict *row){
+Handle HeapTable::insert(const ValueDict *row) {
     this->file.open();
     // return append(validate(row)); this code might lead memory leak
     ValueDict* full_row = validate(row);
@@ -483,7 +480,7 @@ Handle HeapTable::insert(const ValueDict *row){
 }
 
 // Not implemented
-void HeapTable::update(const Handle handle, const ValueDict *new_values){
+void HeapTable::update(const Handle handle, const ValueDict *new_values) {
   throw DbRelationError("Not implemented");
 }
 
@@ -527,11 +524,11 @@ Handles *HeapTable::select(){
 Handles *HeapTable::select(const ValueDict *where){
     open();
     Handles *handles = new Handles();
-    BlockID* block_ids = file.block_ids();
-    for (auto const& block_id: *block_ids) {
-        SlottedPage* block = file.get(block_id);
-        RecordIDs* record_ids = block->ids();
-        for (auto const& record_id: *record_ids) {
+    BlockID *block_ids = file.block_ids();
+    for (auto const &block_id: *block_ids) {
+        SlottedPage *block = file.get(block_id);
+        RecordIDs *record_ids = block->ids();
+        for (auto const &record_id: *record_ids) {
             Handle handle(block_id, record_id);
             if (selected(handle, where)) {
                 handles->push_back(Handle(block_id, record_id));
@@ -642,7 +639,7 @@ Dbt *HeapTable::marshal(const ValueDict *row) const {
                 throw DbRelationError("text field too long to marshal");
             if (offset + 2 + size > DbBlock::BLOCK_SZ)
                 throw DbRelationError("row too big to marshal")
-            *(u16 *)(bytes + offset) = size;
+            *(u16*) (bytes + offset) = size;
             offset += sizeof(u16);
             memcpy(bytes + offset, value.s.c_str(), size);    // Assume ascii
             offset += size;
@@ -658,7 +655,7 @@ Dbt *HeapTable::marshal(const ValueDict *row) const {
 }
 
 // Transform the bit data from a Dbt object into a ValueDict row
-ValueDict *HeapTable::unmarshal(Dbt *data){
+ValueDict *HeapTable::unmarshal(Dbt *data) const {
     ValueDict *row = new ValueDict();
     char *bytes = (char *)data->get_data();
     uint offset = 0;
