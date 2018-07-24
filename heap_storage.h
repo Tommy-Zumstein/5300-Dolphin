@@ -100,7 +100,7 @@ protected:
 	bool closed;
 	Db db;
 	virtual void db_open(uint flags=0);
-	virtual uint32_t get_block_count;
+	virtual uint32_t get_block_count();
 };
 
 /**
@@ -131,7 +131,7 @@ public:
 	virtual Handles* select(const ValueDict* where);
 	virtual ValueDict* project(Handle handle);
 	virtual ValueDict* project(Handle handle, const ColumnNames* column_names);
-  virtual DbRelation::project;
+  using DbRelation::project;
 
 protected:
 	HeapFile file;
