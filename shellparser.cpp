@@ -26,7 +26,7 @@ DbEnv* _DB_ENV;
 // The Parser class itself
 class DBParser{
 
-const vector<string> ParseTreeToString::reserved_words = {
+const vector<string> reserved_words = {
 "COLUMNS", "SHOW", "TABLES",
 "ADD","ALL","ALLOCATE","ALTER","AND","ANY","ARE","ARRAY","AS","ASENSITIVE","ASYMMETRIC","AT",
                   "ATOMIC","AUTHORIZATION","BEGIN","BETWEEN","BIGINT","BINARY","BLOB","BOOLEAN","BOTH","BY","CALL",
