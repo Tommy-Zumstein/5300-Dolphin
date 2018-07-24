@@ -86,7 +86,7 @@ public:
 	 * @param record_id  which record to fetch
 	 * @returns          the data stored for the given record
 	 */
-	virtual Dbt* get(RecordID record_id) throw(DbBlockError) = 0;
+	virtual Dbt* get(RecordID record_id) const = 0;
 
 	/**
 	 * FIXME: Different from solution

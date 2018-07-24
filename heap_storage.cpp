@@ -28,8 +28,7 @@ SlottedPage::SlottedPage(Dbt &block, BlockID block_id, bool is_new) : DbBlock(bl
         this->num_records = 0;
         this->end_free = DbBlock::BLOCK_SZ - 1;
         put_header();
-    }
-    else{
+    } else {
         get_header(this->num_records, this->end_free);
     }
 }
@@ -329,6 +328,7 @@ SlottedPage *HeapFile::get_new(void){
     char block[DbBlock::BLOCK_SZ];
     memset(block, 0, sizeof(block));
     Dbt data(block, sizeof(block));
+
     int block_id = ++this->last;
     Dbt key(&block_id, sizeof(block_id));
 
