@@ -26,6 +26,7 @@ DbEnv* _DB_ENV;
 // The Parser class itself
 class DBParser{
 
+public:
 const vector<string> reserved_words = {
 "COLUMNS", "SHOW", "TABLES",
 "ADD","ALL","ALLOCATE","ALTER","AND","ANY","ARE","ARRAY","AS","ASENSITIVE","ASYMMETRIC","AT",
@@ -53,8 +54,6 @@ const vector<string> reserved_words = {
                   "TRANSLATION","TREAT","TRIGGER","TRUE","UESCAPE","UNION","UNIQUE","UNKNOWN","UNNEST","UPDATE",
                   "UPPER","USER","USING","VALUE","VALUES","VAR_POP","VAR_SAMP","VARCHAR","VARYING","WHEN","WHENEVER",
                   "WHERE","WIDTH_BUCKET","WINDOW","WITH","WITHIN","WITHOUT","YEAR"};
-
-public:
 
   /**
 	 * 	check existence of candiate word
