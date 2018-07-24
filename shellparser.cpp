@@ -4,7 +4,7 @@
 *           Milestone 3: Schema Storage
 * @File: shellparser.cpp - main entry for the relation manager's SQL shell
 * @Group: Dolphin
-* @Author: Wonseok Seo, Kevin Cushing - advised from Kevin Lundeen
+* @Author: Sprint 1 team , Wonseok Seo, Kevin Cushing - advised from Kevin Lundeen
 * @see "Seattle University, cpsc5300, Summer 2018"
 */
 
