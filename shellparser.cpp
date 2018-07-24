@@ -318,7 +318,7 @@ int main(int argc, char *argv[]) {
 								const SQLStatement *statement = parse->getStatement(i);
 								try {
 										cout << dbParser.executeSQL(query) << endl;
-										QueryResult *result - SQLExec::execute(statement);
+										QueryResult *result = SQLExec::execute(statement);
 										cout << *result << endl;
 										delete result;
 								} catch (SQLExecError& e) {
