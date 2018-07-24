@@ -504,19 +504,20 @@ void HeapTable::del(const Handle handle){
  * @return  Handles*
  */
 Handles *HeapTable::select(){
-    open();
-    Handles *handles = new Handles();
-    BlockIDs *block_ids = file.block_ids();
-    for (auto const &block_id : *block_ids) {
-        SlottedPage *block = file.get(block_id);
-        RecordIDs *record_ids = block->ids();
-        for (auto const &record_id : *record_ids)
-            handles->push_back(Handle(block_id, record_id));
-        delete record_ids;
-        delete block;
-    }
-    delete block_ids;
-    return handles;
+    // open();
+    // Handles *handles = new Handles();
+    // BlockIDs *block_ids = file.block_ids();
+    // for (auto const &block_id : *block_ids) {
+    //     SlottedPage *block = file.get(block_id);
+    //     RecordIDs *record_ids = block->ids();
+    //     for (auto const &record_id : *record_ids)
+    //         handles->push_back(Handle(block_id, record_id));
+    //     delete record_ids;
+    //     delete block;
+    // }
+    // delete block_ids;
+    // return handles;
+    return select(nullptr);
 }
 
 // Conceptually, execute: SELECT <handle> FROM <table_name> WHERE <where>
@@ -548,14 +549,15 @@ Handles *HeapTable::select(const ValueDict *where){
  * @return  ValueDict
  */
 ValueDict *HeapTable::project(Handle handle){
-    BlockID block_id = handle.first;
-    RecordID record_id = handle.second;
-    SlottedPage *block = this->file.get(block_id);
-    Dbt *data = block->get(record_id);
-    ValueDict *row = unmarshal(data);
-    delete data; // prevent memory leak (sprint 2)
-    delete block; // prevent memory leak (sprint 2)
-    return row;
+    // BlockID block_id = handle.first;
+    // RecordID record_id = handle.second;
+    // SlottedPage *block = this->file.get(block_id);
+    // Dbt *data = block->get(record_id);
+    // ValueDict *row = unmarshal(data);
+    // delete data; // prevent memory leak (sprint 2)
+    // delete block; // prevent memory leak (sprint 2)
+    // return row;
+    return project(handle, &this->column_names);
 }
 
 /**
@@ -567,7 +569,11 @@ ValueDict *HeapTable::project(Handle handle){
  */
 ValueDict *HeapTable::project(Handle handle, const ColumnNames *column_names){
     ValueDict *result = new ValueDict();
-    ValueDict *row = project(handle);
+    BlockID block_id = handle.first;
+  	RecordID record_id = handle.second;
+    SlottedPage* block = file.get(block_id);
+    Dbt* data = block->get(record_id);
+    ValueDict* row = unmarshal(data);
     if (column_names == NULL || column_names->empty()){
         delete result; // prevent memory leak (sprint 2)
         return row;
@@ -576,7 +582,7 @@ ValueDict *HeapTable::project(Handle handle, const ColumnNames *column_names){
         for (auto const &column_name : *column_names){
             if (row->find(column_name) != row->end()) {
                 result->insert(std::pair<Identifier, Value>(column_name, row->at(column_name)));
-            } else { // thow exception added (sprint 2)
+            } else { // throw exception added (sprint 2)
                 throw DbRelationError("table does not have column named ''" + column_name + "'");
             }
         }
