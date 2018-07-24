@@ -23,4 +23,4 @@ shellparser.o : $(SQLEXEC_H) ParseTreeToString.h
 	g++ -I$(INCLUDE_DIR) $(CCFLAGS) -o "$@" "$<"
 
 clean:
-	 rm -f shellparser *.o
+	 rm -f shellparser *.o __db.001 __db.002 __db.003 _tables.db _columns.db
