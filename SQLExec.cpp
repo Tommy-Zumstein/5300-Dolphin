@@ -117,7 +117,7 @@ QueryResult *SQLExec::create(const CreateStatement *statement) {
     ColumnAttribute column_attribute;
     // insert column name and column attribute definitions into each vectors
     for (ColumnDefinition *columnDef : *statement->columns) {
-        column_definition(columnDef, column_name, column_attribute);
+        column_definition(col, column_name, column_attribute);
         column_names.push_back(column_name);
         column_attributes.push_back(column_attribute);
     }
