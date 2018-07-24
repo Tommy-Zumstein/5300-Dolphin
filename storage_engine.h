@@ -249,7 +249,7 @@ typedef std::vector<ColumnAttribute> ColumnAttributes;
 typedef std::pair<BlockID, RecordID> Handle;
 typedef std::vector<Handle> Handles;  // FIXME: will need to turn this into an iterator at some point
 typedef std::map<Identifier, Value> ValueDict;
-typedef std::vector<ValueDict*> ValueDcits;
+typedef std::vector<ValueDict*> ValueDicts;
 
 
 /**
