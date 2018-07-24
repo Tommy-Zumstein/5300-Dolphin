@@ -490,7 +490,7 @@ void HeapTable::update(const Handle handle, const ValueDict *new_values) {
 // Author: Kevin
 void HeapTable::del(const Handle handle){
     open();
-    BlocID block_id = handle.first;
+    BlockID block_id = handle.first;
     RecordID record_id = handle.second;
     SlottedPage* block = this->file.get(block_id);
     block->del(record_id);
@@ -524,7 +524,7 @@ Handles *HeapTable::select(){
 Handles *HeapTable::select(const ValueDict *where){
     open();
     Handles *handles = new Handles();
-    BlockID *block_ids = file.block_ids();
+    BlockIDs *block_ids = file.block_ids();
     for (auto const &block_id: *block_ids) {
         SlottedPage *block = file.get(block_id);
         RecordIDs *record_ids = block->ids();
