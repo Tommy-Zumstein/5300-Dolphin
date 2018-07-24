@@ -309,7 +309,7 @@ int main(int argc, char *argv[]) {
 						cout << "test_heap_storage: " << (test_heap_storage() ? "ok" : "failed") << endl;
 						continue;
 				}
-				SQLPArserResult* parse = SQLParser::parseSQLString(query);
+				SQLParserResult* parse = SQLParser::parseSQLString(query);
 				if (!parse->isValie()) {
 						cout << "invalid SQL: " << query << endl;
 						cout << parse->errorMsg() << endl;
