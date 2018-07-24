@@ -61,7 +61,7 @@ const vector<string> reserved_words = {
 	 *	@return 					if it exsits return true, if not return false
 	 */
 	bool is_reserved_word(string candidate) {
-			if (auto const& word: reserved_words)
+			for (auto const& word: reserved_words)
 					if (candidate == word)
 							return true;
 			return false;
