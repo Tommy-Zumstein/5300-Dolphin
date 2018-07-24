@@ -567,6 +567,7 @@ ValueDict *HeapTable::project(Handle handle){
  */
 ValueDict *HeapTable::project(Handle handle, const ColumnNames *column_names){
     ValueDict *result = new ValueDict();
+    ValueDict *row = project(handle);
     if (column_names == NULL || column_names->empty()){
         delete result; // prevent memory leak (sprint 2)
         return row;
