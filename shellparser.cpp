@@ -60,7 +60,7 @@ const vector<string> reserved_words = {
 	 * 	@param candiate 	target string word to check
 	 *	@return 					if it exsits return true, if not return false
 	 */
-	bool is_reserved_word(string candidate) {
+	static bool is_reserved_word(string candidate) {
 			for (auto const& word: reserved_words)
 					if (candidate == word)
 							return true;
@@ -72,7 +72,7 @@ const vector<string> reserved_words = {
 	* @param	TableRef *table
 	* @return	string
 	*/
-	string printTableRefInfo(TableRef *table){
+	static string printTableRefInfo(TableRef *table){
 		string tableref;
 		switch (table->type){
 		case kTableSelect:
@@ -125,7 +125,7 @@ const vector<string> reserved_words = {
 	* @param	Expr *expr
 	* @return	string
 	*/
-	string printOperatorExpression(Expr *expr){
+	static string printOperatorExpression(Expr *expr){
 		string operatorExpression;
 		if (expr == nullptr){
 			operatorExpression = "null";
@@ -160,7 +160,7 @@ const vector<string> reserved_words = {
 	* @param	Expr *expr
 	* @return	string
 	*/
-	string printExpression(Expr *expr){
+	static string printExpression(Expr *expr){
 		string expression;
 		switch (expr->type){
 		case kExprStar:
@@ -205,7 +205,7 @@ const vector<string> reserved_words = {
 	* @param	const ColumnDefinition *col
 	* @return	string
 	*/
-	string columnDefinitionToString(const ColumnDefinition *col){
+	static string columnDefinitionToString(const ColumnDefinition *col){
 		string columnDef(col->name);
 		switch (col->type){
 		case ColumnDefinition::DOUBLE:
@@ -229,7 +229,7 @@ const vector<string> reserved_words = {
 	* @param	Selectstatement *stmt
 	* @return	string
 	*/
-	string executeCreateStatement(const CreateStatement *stmt){
+	static string executeCreateStatement(const CreateStatement *stmt){
 		string statement = "CREATE ";
 		if (stmt->type != CreateStatement::kTable)
 				return statement + "...";
@@ -253,7 +253,7 @@ const vector<string> reserved_words = {
 	* @param	Selectstatement *stmt
 	* @return	string
 	*/
-	string executeSelectStatement(const SelectStatement *stmt){
+	static string executeSelectStatement(const SelectStatement *stmt){
 		string statement = "SELECT ";
 		int comma = 0;
 		for (Expr *expr : *stmt->selectList){
@@ -288,7 +288,7 @@ const vector<string> reserved_words = {
 	 * 	@param DropStatement *stmt
 	 *	@return string
 	 */
-	string executeDropStatement(const DropStatement *stmt) {
+	static string executeDropStatement(const DropStatement *stmt) {
 			string statement = "DROP ";
 			switch (stmt->type) {
 					case DropStatement::kTable:
@@ -301,7 +301,7 @@ const vector<string> reserved_words = {
 			return statement;
 	}
 
-	string executeShowStatement(const ShowStatement *stmt) {
+	static string executeShowStatement(const ShowStatement *stmt) {
 			string statement = "SHOW ";
 			switch (stmt->type) {
 					case ShowStatement::kTables:
@@ -322,7 +322,7 @@ const vector<string> reserved_words = {
 	* @param	stmt, Hyrise AST for the statement
 	* @return	string, the parsed SQL
 	*/
-	string executeStatement(const SQLStatement *stmt){
+	static string executeStatement(const SQLStatement *stmt){
 		switch (stmt->type()){
 		case kStmtSelect:
 			return executeSelectStatement((const SelectStatement *)stmt);
@@ -342,7 +342,7 @@ const vector<string> reserved_words = {
 	* @param	SQLStatement, String with the input
 	* @return	string, the parsed SQL
 	*/
-	string executeSQL(string SQLStatement){
+	static string executeSQL(string SQLStatement){
 		string output;
 		SQLParserResult *result = SQLParser::parseSQLString(SQLStatement);
 		if (result->isValid()){
