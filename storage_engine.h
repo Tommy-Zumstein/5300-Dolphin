@@ -197,7 +197,7 @@ public:
 	 * FIXME - not a good long-term approach, but we'll do this until we put in iterators
 	 * @returns  a pointer to vector of BlockIDs (freed by caller)
 	 */
-	virtual BlockIDs* block_ids() = 0;
+	virtual BlockIDs* block_ids() const = 0;
 
 protected:
 	std::string name;  // filename (or part of it)
