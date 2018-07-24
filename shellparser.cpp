@@ -310,7 +310,7 @@ int main(int argc, char *argv[]) {
 						continue;
 				}
 				SQLParserResult* parse = SQLParser::parseSQLString(query);
-				if (!parse->isValie()) {
+				if (!parse->isValid()) {
 						cout << "invalid SQL: " << query << endl;
 						cout << parse->errorMsg() << endl;
 				} else {
