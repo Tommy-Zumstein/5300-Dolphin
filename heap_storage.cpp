@@ -45,7 +45,7 @@ RecordID SlottedPage::add(const Dbt *data) throw(DbBlockNoRoomError){
     u16 id = ++this->num_records;
     u16 size = (u16)data->get_size();
     this->end_free -= size;
-    u16 loc = this->end_free + 1;
+    u16 loc = this->end_free + 1U;
     put_header();
     put_header(id, size, loc);
     memcpy(this->address(loc), data->get_data(), size);
@@ -128,15 +128,13 @@ void SlottedPage::del(RecordID record_id){
 
     u16 size, loc;
     get_header(size, loc, record_id);
-
-    slide(record_id + 1, size, false);
     put_header(record_id, 0U, 0U);
 
     if (record_id == this->num_records){
         this->end_free += size;
+    } else {
+        slide(record_id + 1, size, false);
     }
-
-    put_header();
 }
 
 /**
