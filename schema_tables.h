@@ -55,7 +55,7 @@ public:
      * @param table_name  table to get
      * @returns           instantiated DbRelation of the correct type
      */
-    virtual DbRelation& get_table(Identifier table_name);
+    static DbRelation& get_table(Identifier table_name);
 
 protected:
     // hard-coded columns for _tables table
