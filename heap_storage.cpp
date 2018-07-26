@@ -270,7 +270,7 @@ void HeapFile::create(void) {
 void HeapFile::drop(void) {
     close();
     Db db(_DB_ENV, 0);
-    db.remove(NULL, this->dbfilename.c_str(), NULL , 0);
+    db.remove(this->dbfilename.c_str(), nullptr , 0);
 }
 
 /**
