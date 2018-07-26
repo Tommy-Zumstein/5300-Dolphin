@@ -203,7 +203,7 @@ public:
         } else if (stmt->type == CreateStatement::kIndex) {
             statement += "INDEX ";
             statement += string(stmt->indexName) + "ON ";
-            statement += string(stmt->tableName) + "USING " + stmt->IndexType + " (";
+            statement += string(stmt->tableName) + "USING " + stmt->indexType + " (";
             int comma = 0;
             for (auto const& col: *stmt->indexColumns) {
                 if (comma == 1)
@@ -263,7 +263,7 @@ public:
         case DropStatement::kTable:
             statement += "TABLE ";
             break;
-        case DropStatment::kIndex:
+        case DropStatement::kIndex:
             statement += string("INDEX ") + stmt->indexName + " FROM ";
             break;
         default:
