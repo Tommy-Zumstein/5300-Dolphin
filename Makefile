@@ -28,4 +28,4 @@ shellparser.o : $(SQLEXEC_H)
 
 # Rule for removing all non-source files
 clean:
-    rm -f shellparser *.o __db.001 __db.002 __db.003 _tables.db _columns.db
+	rm -f shellparser *.o __db.001 __db.002 __db.003 _tables.db _columns.db
