@@ -92,28 +92,30 @@ void SlottedPage::put(RecordID record_id, const Dbt &data) throw(DbBlockNoRoomEr
         u16 shift_loc = new_size - old_size;
         u16 new_loc = old_loc - shift_loc;
 
-        slide(record_id + 1, shift_loc);
+
         memcpy(this->address(new_loc), data.get_data(), new_size);
         put_header(record_id, new_size, new_loc);
 
         if (record_id == this->num_records){
             this->end_free -= shift_loc;
+        } else {
+            slide(record_id + 1, shift_loc);
         }
     }
     else{
         u16 shift_loc = old_size - new_size;
         u16 new_loc = old_loc + shift_loc;
 
-        slide(record_id + 1, shift_loc, false);
+
         memcpy(this->address(new_loc), data.get_data(), new_size);
         put_header(record_id, new_size, new_loc);
 
         if (record_id == this->num_records){
             this->end_free += shift_loc;
+        } else {
+            slide(record_id + 1, shift_loc, false);
         }
     }
-
-    put_header();
 }
 
 /**
