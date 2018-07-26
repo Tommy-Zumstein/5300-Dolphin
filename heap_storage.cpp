@@ -552,19 +552,20 @@ void HeapTable::del(const Handle handle){
  * @return  Handles*
  */
 Handles *HeapTable::select(){
-    open();
-    Handles *handles = new Handles();
-    BlockIDs *block_ids = file.block_ids();
-    for (auto const &block_id : *block_ids) {
-        SlottedPage *block = file.get(block_id);
-        RecordIDs *record_ids = block->ids();
-        for (auto const &record_id : *record_ids)
-            handles->push_back(Handle(block_id, record_id));
-        delete record_ids;
-        delete block;
-    }
-    delete block_ids;
-    return handles;
+    // open();
+    // Handles *handles = new Handles();
+    // BlockIDs *block_ids = file.block_ids();
+    // for (auto const &block_id : *block_ids) {
+    //     SlottedPage *block = file.get(block_id);
+    //     RecordIDs *record_ids = block->ids();
+    //     for (auto const &record_id : *record_ids)
+    //         handles->push_back(Handle(block_id, record_id));
+    //     delete record_ids;
+    //     delete block;
+    // }
+    // delete block_ids;
+    // return handles;
+    return select(nullptr);
 }
 
 // Conceptually, execute: SELECT <handle> FROM <table_name> WHERE <where>
@@ -596,14 +597,15 @@ Handles *HeapTable::select(const ValueDict *where){
  * @return  ValueDict
  */
 ValueDict *HeapTable::project(Handle handle){
-    BlockID block_id = handle.first;
-    RecordID record_id = handle.second;
-    SlottedPage *block = this->file.get(block_id);
-    Dbt *data = block->get(record_id);
-    ValueDict *row = unmarshal(data);
-    delete data; // prevent memory leak (sprint 2)
-    delete block; // prevent memory leak (sprint 2)
-    return row;
+    // BlockID block_id = handle.first;
+    // RecordID record_id = handle.second;
+    // SlottedPage *block = this->file.get(block_id);
+    // Dbt *data = block->get(record_id);
+    // ValueDict *row = unmarshal(data);
+    // delete data; // prevent memory leak (sprint 2)
+    // delete block; // prevent memory leak (sprint 2)
+    // return row;
+    return project(handle, &this->column_names);
 }
 
 /**
@@ -614,23 +616,40 @@ ValueDict *HeapTable::project(Handle handle){
  * @thorw   DbRelationError
  */
 ValueDict *HeapTable::project(Handle handle, const ColumnNames *column_names){
-    ValueDict *result = new ValueDict();
-    ValueDict *row = project(handle);
-    if (column_names == NULL || column_names->empty()){
-        delete result; // prevent memory leak (sprint 2)
-        return row;
-    }
-    else{
-        for (auto const &column_name : *column_names){
-            if (row->find(column_name) != row->end()) {
-                result->insert(std::pair<Identifier, Value>(column_name, row->at(column_name)));
-            } else { // throw exception added (sprint 2)
-                throw DbRelationError("table does not have column named ''" + column_name + "'");
-            }
-        }
-    }
-    delete row; // prevent memory leak (sprint 2)
-    return result;
+    // ValueDict *result = new ValueDict();
+    // ValueDict *row = project(handle);
+    // if (column_names == NULL || column_names->empty()){
+    //     delete result; // prevent memory leak (sprint 2)
+    //     return row;
+    // }
+    // else{
+    //     for (auto const &column_name : *column_names){
+    //         if (row->find(column_name) != row->end()) {
+    //             result->insert(std::pair<Identifier, Value>(column_name, row->at(column_name)));
+    //         } else { // throw exception added (sprint 2)
+    //             throw DbRelationError("table does not have column named ''" + column_name + "'");
+    //         }
+    //     }
+    // }
+    // delete row; // prevent memory leak (sprint 2)
+    // return result;
+    BlockID block_id = handle.first;
+  	RecordID record_id = handle.second;
+      SlottedPage* block = file.get(block_id);
+      Dbt* data = block->get(record_id);
+      ValueDict* row = unmarshal(data);
+      delete data;
+      delete block;
+      if (column_names->empty())
+      	return row;
+      ValueDict* result = new ValueDict();
+      for (auto const& column_name: *column_names) {
+  		if (row->find(column_name) == row->end())
+  			throw DbRelationError("table does not have column named '" + column_name + "'");
+      	(*result)[column_name] = (*row)[column_name];
+  	}
+  	delete row;
+      return result;
 }
 
 // Validate the row before insert it
@@ -705,29 +724,55 @@ Dbt *HeapTable::marshal(const ValueDict *row) const {
 
 // Transform the bit data from a Dbt object into a ValueDict row
 ValueDict *HeapTable::unmarshal(Dbt *data) const {
+    // ValueDict *row = new ValueDict();
+    // char *bytes = (char *)data->get_data();
+    // uint offset = 0;
+    // uint col_num = 0;
+    // for (auto const &column_name : this->column_names){
+    //     ColumnAttribute ca = this->column_attributes[col_num++];
+    //     if (ca.get_data_type() == ColumnAttribute::DataType::INT){
+    //         int32_t n = *(int32_t *)(bytes + offset);
+    //         row->insert(std::pair<Identifier, Value>(column_name, Value(n)));
+    //         offset += sizeof(int32_t);
+    //     }
+    //     else if (ca.get_data_type() == ColumnAttribute::DataType::TEXT){
+    //         u16 size = *(u16 *)(bytes + offset);
+    //         offset += sizeof(u16);
+    //         char buffer[DbBlock::BLOCK_SZ];
+    //         memcpy(buffer, bytes + offset, size);    // Assume ascii for now
+    //         buffer[size] = '\0';
+    //         row->insert(std::pair<Identifier, Value>(column_name, Value(buffer)));
+    //         offset += size;
+    //     }
+    //     else{
+    //         throw DbRelationError("Only know how to marshal INT and TEXT");    // Not implemented
+    //     }
+    // }
+    // return row;
+
     ValueDict *row = new ValueDict();
-    char *bytes = (char *)data->get_data();
+    Value value;
+    char *bytes = (char*)data->get_data();
     uint offset = 0;
     uint col_num = 0;
-    for (auto const &column_name : this->column_names){
-        ColumnAttribute ca = this->column_attributes[col_num++];
-        if (ca.get_data_type() == ColumnAttribute::DataType::INT){
-            int32_t n = *(int32_t *)(bytes + offset);
-            row->insert(std::pair<Identifier, Value>(column_name, Value(n)));
-            offset += sizeof(int32_t);
-        }
-        else if (ca.get_data_type() == ColumnAttribute::DataType::TEXT){
-            u16 size = *(u16 *)(bytes + offset);
-            offset += sizeof(u16);
-            char buffer[DbBlock::BLOCK_SZ];
-            memcpy(buffer, bytes + offset, size);    // Assume ascii for now
-            buffer[size] = '\0';
-            row->insert(std::pair<Identifier, Value>(column_name, Value(buffer)));
+    for (auto const& column_name: this->column_names) {
+    	ColumnAttribute ca = this->column_attributes[col_num++];
+		value.data_type = ca.get_data_type();
+    	if (ca.get_data_type() == ColumnAttribute::DataType::INT) {
+    		value.n = *(int32_t*)(bytes + offset);
+    		offset += sizeof(int32_t);
+    	} else if (ca.get_data_type() == ColumnAttribute::DataType::TEXT) {
+    		u16 size = *(u16*)(bytes + offset);
+    		offset += sizeof(u16);
+    		char buffer[DbBlock::BLOCK_SZ];
+    		memcpy(buffer, bytes+offset, size);
+    		buffer[size] = '\0';
+    		value.s = string(buffer);  // assume ascii for now
             offset += size;
-        }
-        else{
-            throw DbRelationError("Only know how to marshal INT and TEXT");    // Not implemented
-        }
+    	} else {
+            throw DbRelationError("Only know how to unmarshal INT and TEXT");
+    	}
+		(*row)[column_name] = value;
     }
     return row;
 }
