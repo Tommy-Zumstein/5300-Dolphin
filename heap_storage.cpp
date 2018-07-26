@@ -205,7 +205,7 @@ void SlottedPage::slide(RecordID start_record_id, u16 offset, bool left) {
     u16 begin_offset, begin_size;
     get_header(begin_size, begin_offset, start_record_id);
     u16 shift_size = begin_offset + begin_size - 1 - this->end_free;
-    char temp[shift_block_size];
+    char temp[shift_size];
     memcpy(temp, this->address(this->end_free + 1), shift_size);
     if (left) {
         memcpy(this->address(this->end_free + 1 - offset), temp, shift_size);
@@ -548,8 +548,8 @@ ValueDict *HeapTable::validate(const ValueDict *row) const {
     ValueDict *validated = new ValueDict();
     for (auto const &column_name : this->column_names) {
         if (row->find(column_name) == row->end()) {
-            throw DbRelationError("don't know how to handle NULLs, " +
-                                  "defaults, etc, yet");
+            string m = "don't know how to handle NULLs, defaults, etc, yet";
+            throw DbRelationError(m);
         } else {
             validated->insert(std::pair<Identifier, Value>(column_name,
                               row->at(column_name)));
@@ -691,8 +691,7 @@ bool test_heap_storage() {
     table.create_if_not_exists();
     cout << "create_if_not_exsts ok" << endl;
     ValueDict row;
-	  string b = "alkjsl;kj; as;lkj;alskjf;laks df;alsdkjfa;lsdkfj " +
-               ";alsdfkjads;lfkj a;sldfkj a;sdlfjk a";
+	  string b = "alkjsl;kj; as;lkj;alskjf;laalsdfkjads;lfkj a;sldfkj a;sdlfjk a";
 	  test_set_row(row, -1, b);
     table.insert(&row);
     cout << "insert ok" << endl;
