@@ -91,7 +91,6 @@ public:
 	virtual void put(DbBlock* block);
 	virtual BlockIDs* block_ids() const;
 
-  // FIXME: Function from sprint 1
 	virtual u_int32_t get_last_block_id() {return last;}
 
 protected:

@@ -81,7 +81,6 @@ public:
 	virtual RecordID add(const Dbt* data) throw(DbBlockNoRoomError) = 0;
 
 	/**
-	 * FIXME: Different from solution
 	 * Get a record from this block.
 	 * @param record_id  which record to fetch
 	 * @returns          the data stored for the given record
