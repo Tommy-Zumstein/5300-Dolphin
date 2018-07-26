@@ -202,7 +202,7 @@ class ColumnAttribute {
 public:
     enum DataType {
         INT,
-        TEXT.
+        TEXT,
         BOOLEAN
     };
     ColumnAttribute() : data_type(INT) {}
