@@ -338,9 +338,12 @@ void HeapFile::create(void){
  * @Author  sprint 1 group
  */
 void HeapFile::drop(void){
-    open();
+    // open();
+    // close();
+    // _DB_ENV->dbremove(NULL, this->dbfilename.c_str(), NULL , 0);
     close();
-    _DB_ENV->dbremove(NULL, this->dbfilename.c_str(), NULL , 0);
+  	Db db(_DB_ENV, 0);
+  	db.remove(this->dbfilename.c_str(), nullptr, 0);
 }
 
 /**
