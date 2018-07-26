@@ -74,7 +74,7 @@ Dbt *SlottedPage::get(RecordID record_id) const {
  * @return  void
  * @Author  sprint 1 group
  */
-void SlottedPage::put(RecordID record_id, const Dbt &data) throw(DbBlockNoRoomError, DbBlockError){
+void SlottedPage::put(RecordID record_id, const Dbt &data) throw(DbBlockNoRoomError) {//, DbBlockError){
     // if (!have_record(record_id))
     //     throw DbBlockError("Record not found");
     //
