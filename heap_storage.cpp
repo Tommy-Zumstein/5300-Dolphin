@@ -62,7 +62,8 @@ Dbt *SlottedPage::get(RecordID record_id) const {
     u16 size = 0;
     u16 loc = 0;
     this->get_header(size, loc, record_id);
-
+    if (loc == 0)
+        return nullptr;
     return new Dbt(this->address(loc), size);
 }
 
@@ -176,8 +177,8 @@ bool SlottedPage::have_record(RecordID record_id) const {
 // Set the header values from a record
 // @author  Kevin Lundeen
 void SlottedPage::get_header(u16 &size, u16 &loc, RecordID id) const {
-    size = get_n(4 * id);
-    loc = get_n(4 * id + 2);
+    size = get_n((u16)4 * id);
+    loc = get_n((u16)(4 * id + 2));
 }
 
 // Store the size and offset for given id. For id of zero, store the block header.
@@ -187,8 +188,8 @@ void SlottedPage::put_header(RecordID id, u16 size, u16 loc){
         size = this->num_records;
         loc = this->end_free;
     }
-    put_n(4 * id, size);
-    put_n(4 * id + 2, loc);
+    put_n((u16)4 * id, size);
+    put_n((u16)(4 * id + 2), loc);
 }
 
 // Check if there is enough room
