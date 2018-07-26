@@ -278,7 +278,7 @@ QueryResult *SQLExec::drop_table(const DropStatement *statement) {
     //remove indices
     ValueDicts* to_drop = new ValueDicts;
     //DbRelation& _indices = SQLExec::tables->get_table(Indices::TABLE_NAME);
-    Handles* index_handles = SQLExec::indices->select(&where);
+    Handles* index_handles = SQLExec::indices->select(&target);
     for (auto const& handle: *index_handles) {
         ValueDict* index_attributes = SQLExec::indices->project(handle);
         to_drop->push_back(index_attributes);
@@ -322,7 +322,7 @@ QueryResult *SQLExec::drop_index(const DropStatement *statement) {
     Identifier index_name = statement->indexName;
 
     // get the index
-    DbRelation& index = SQLExec::indices->get_index(table_name, index_name);
+    DbIndex& index = SQLExec::indices->get_index(table_name, index_name);
 
     ValueDict where;
     where["table_name"] = Value(table_name);
@@ -391,7 +391,7 @@ QueryResult *SQLExec::show_tables() {
 // Exectue SHOW statement for columns
 QueryResult *SQLExec::show_columns(const ShowStatement *statement) {
     // to hold column schema table
-    DbRelation& columns = SQLExec::tables->get_table(Columns::TABLE_NAME);
+    DbRelation&  = SQLExec::tables->get_table(Columns::TABLE_NAME);
 
     // to hold column names for schema table, table_name, column_name, data_type
     ColumnNames* name_keys = new ColumnNames;
@@ -429,9 +429,6 @@ QueryResult *SQLExec::show_columns(const ShowStatement *statement) {
 
 // Exectue SHOW statement for indices
 QueryResult *SQLExec::show_index(const ShowStatement *statement) {
-    // to hold column schema table
-    DbRelation& columns = SQLExec::tables->get_table(Indices::TABLE_NAME);
-
     // to hold column names for schema table:
     // table_name, column_name, data_type
     ColumnNames* name_keys = new ColumnNames;
@@ -446,8 +443,12 @@ QueryResult *SQLExec::show_index(const ShowStatement *statement) {
     ColumnAttributes* attribute_key = new ColumnAttributes;
     attribute_key->push_back(ColumnAttribute(ColumnAttribute::TEXT));
 
+    // to hold target location
+    ValueDict target;
+    target["table_name"] = Value(statement->tableName);
+
     // to hold handles for all indices
-    Handles* handles = SQLExec::indices->select();
+    Handles* handles = SQLExec::indices->select(&target);
 
     // the number of columns
     u_long row_size = handles->size();
@@ -455,7 +456,7 @@ QueryResult *SQLExec::show_index(const ShowStatement *statement) {
     // to hold all columns
     ValueDicts* rows = new ValueDicts;
     for (auto const& handle: *handles) {
-        ValueDict* row = SQLExec::indices->project(handle, name_key);
+        ValueDict* row = SQLExec::indices->project(handle, name_keys);
         rows->push_back(row);
     }
 
