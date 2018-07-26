@@ -107,7 +107,7 @@ void SlottedPage::put(RecordID record_id, const Dbt &data) throw(DbBlockNoRoomEr
         u16 new_loc = old_loc + shift_loc;
 
 
-        memcpy(this->address(new_loc), data.get_data(), new_size);
+        memcpy(this->address(old_loc), data.get_data(), new_size);
         put_header(record_id, new_size, new_loc);
 
         if (record_id == this->num_records){
