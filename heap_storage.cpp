@@ -116,6 +116,7 @@ void SlottedPage::put(RecordID record_id, const Dbt &data) throw(DbBlockNoRoomEr
             slide(record_id + 1, shift_loc, false);
         }
     }
+}
 
 /**
  * Delete a record with a specific id
