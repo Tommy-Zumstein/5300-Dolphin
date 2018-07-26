@@ -192,8 +192,9 @@ void SlottedPage::put_header(RecordID id, u16 size, u16 loc){
 }
 
 // Check if there is enough room
+// fixed wrong implementation
 bool SlottedPage::has_room(u16 size) const {
-    return 4 * this->num_records + 3 < this->end_free - size + 1;
+    return 4 * this->num_records + 4 <= this->end_free - size;
 }
 
 // Author   sprint 1 group
