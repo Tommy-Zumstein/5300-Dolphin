@@ -391,7 +391,7 @@ QueryResult *SQLExec::show_tables() {
 // Exectue SHOW statement for columns
 QueryResult *SQLExec::show_columns(const ShowStatement *statement) {
     // to hold column schema table
-    DbRelation&  = SQLExec::tables->get_table(Columns::TABLE_NAME);
+    DbRelation& columns = SQLExec::tables->get_table(Columns::TABLE_NAME);
 
     // to hold column names for schema table, table_name, column_name, data_type
     ColumnNames* name_keys = new ColumnNames;
