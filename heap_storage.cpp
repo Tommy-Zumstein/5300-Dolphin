@@ -164,33 +164,42 @@ void SlottedPage::del(RecordID record_id){
  * @Author  sprint 1 group
  */
 RecordIDs *SlottedPage::ids(void) const {
-    RecordIDs *record_ids = new RecordIDs();
+    // RecordIDs *record_ids = new RecordIDs();
+    //
+    // for (RecordID i = 1; i <= this->num_records; i++){
+    //     if (have_record(i)){
+    //         record_ids->push_back(i);
+    //     }
+    // }
+    //
+    // return record_ids;
 
-    for (RecordID i = 1; i <= this->num_records; i++){
-        if (have_record(i)){
-            record_ids->push_back(i);
-        }
-    }
-
-    return record_ids;
+    RecordIDs* vec = new RecordIDs();
+  	u16 size, loc;
+  	for (RecordID record_id = 1; record_id <= this->num_records; record_id++) {
+  	    get_header(size, loc, record_id);
+  	    if (loc != 0)
+  	    	vec->push_back(record_id);
+  	}
+  	return vec;
 }
 
 // Check if the record exists based on the record id
 // Author   sprint 1 group
-bool SlottedPage::have_record(RecordID record_id) const {
-    if (record_id == 0 || record_id > this->num_records)
-        return false;
-
-    u16 size;
-    u16 loc;
-
-    get_header(size, loc, record_id);
-
-    if (loc == 0)
-        return false;
-
-    return true;
-}
+// bool SlottedPage::have_record(RecordID record_id) const {
+//     if (record_id == 0 || record_id > this->num_records)
+//         return false;
+//
+//     u16 size;
+//     u16 loc;
+//
+//     get_header(size, loc, record_id);
+//
+//     if (loc == 0)
+//         return false;
+//
+//     return true;
+// }
 
 // Set the header values from a record
 // @author  Kevin Lundeen
