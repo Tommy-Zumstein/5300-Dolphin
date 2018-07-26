@@ -1,5 +1,6 @@
 /**
  * @file SQLExec.cpp - implementation of SQLExec class
+ * @gourp Dolphin sprint2
  * @author Wonseok Seo, Kevin Cushing - advised from Kevin Lundeen @SU
  * @see "Seattle University, CPSC5300, Summer 2018"
  */

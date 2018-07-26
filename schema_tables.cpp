@@ -4,8 +4,7 @@
  * @see "Seattle University, CPSC5300, Summer 2018"
  */
 #include "schema_tables.h"
-//#include "ParseTreeToString.h"
-
+//#include "ParseTreeToString.h" - Unused header file
 
 void initialize_schema_tables() {
     Tables tables;
@@ -18,6 +17,7 @@ void initialize_schema_tables() {
 
 // Not terribly useful since the parser weeds most of these out
 bool is_acceptable_identifier(Identifier identifier) {
+    // Unused part
     //if (ParseTreeToString::is_reserved_word(identifier))
     //    return true;
     try {
