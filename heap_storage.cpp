@@ -94,15 +94,13 @@ void SlottedPage::put(RecordID record_id, const Dbt &data) throw(DbBlockNoRoomEr
         u16 shift_loc = new_size - old_size;
         // calculate new location
         u16 new_loc = old_loc - shift_loc;
+        slide(record_id + 1, shift_loc);
         memcpy(this->address(new_loc), data.get_data(), new_size);
         // update header
         put_header(record_id, new_size, new_loc);
         // in case of the target record is the last one
         if (record_id == this->num_records) {
             this->end_free -= shift_loc;
-        } else { // in case of the target record is not the last one
-            // slide to left
-            slide(record_id + 1, shift_loc);
         }
     // in case of new data size is not bigger than before
     } else {
@@ -110,17 +108,16 @@ void SlottedPage::put(RecordID record_id, const Dbt &data) throw(DbBlockNoRoomEr
         u16 shift_loc = old_size - new_size;
         // calculate new location
         u16 new_loc = old_loc + shift_loc;
-        memcpy(this->address(old_loc), data.get_data(), new_size);
+        slide(record_id + 1, shift_loc, false);
+        memcpy(this->address(new_loc), data.get_data(), new_size);
         // update header
         put_header(record_id, new_size, new_loc);
         // in case of the target record is the last one
         if (record_id == this->num_records){
             this->end_free += shift_loc;
-        } else { // in case of the target record is not the last one
-            // slide to right
-            slide(record_id + 1, shift_loc, false);
         }
     }
+    put_header();
 }
 
 /**
@@ -136,14 +133,13 @@ void SlottedPage::del(RecordID record_id) {
     // to hold size and location of the record
     u16 size, loc;
     get_header(size, loc, record_id);
+    slide(record_id + 1, size, false);
     put_header(record_id, 0U, 0U);
     // in case of the record is the last one
     if (record_id == this->num_records){
        this->end_free += size;
-    } else { // in case of the record is not the last one
-        // slide to right
-        slide(record_id + 1, size, false);
     }
+    put_header();
 }
 
 /**
@@ -199,6 +195,10 @@ bool SlottedPage::has_room(u16 size) const {
 //       it is based on record_id instead of location (From sprint1), we made
 //       slight modificaiton
 void SlottedPage::slide(RecordID start_record_id, u16 offset, bool left) {
+    while (start_record_id <= this->num_records &&
+           !have_record(start_record_id)) {
+        start_record_id++;
+    }
     if (start_record_id > this->num_records) {
         return;
     }
@@ -268,9 +268,9 @@ void HeapFile::create(void) {
  * Delete the file, and the physical file
  */
 void HeapFile::drop(void) {
-    open();
     close();
-    _DB_ENV->dbremove(NULL, this->dbfilename.c_str(), NULL , 0);
+    Db db(_DB_ENV, 0);
+    db.remove(NULL, this->dbfilename.c_str(), NULL , 0);
 }
 
 /**
