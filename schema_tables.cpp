@@ -15,7 +15,7 @@ void initialize_schema_tables() {
     columns.close();
     Indices indices;
     indices.create_if_not_exists();
-    indicies.close();
+    indices.close();
 }
 
 // Not terribly useful since the parser weeds most of these out
