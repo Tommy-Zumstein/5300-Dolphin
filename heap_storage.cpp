@@ -75,47 +75,62 @@ Dbt *SlottedPage::get(RecordID record_id) const {
  * @Author  sprint 1 group
  */
 void SlottedPage::put(RecordID record_id, const Dbt &data) throw(DbBlockNoRoomError, DbBlockError){
-    if (!have_record(record_id))
-        throw DbBlockError("Record not found");
-
-    u16 old_size;
-    u16 old_loc;
-
-    get_header(old_size, old_loc, record_id);
-
-    u16 new_size = (u16)data.get_size();
-
-    if (new_size > old_size && !has_room(new_size - old_size))
-        throw DbBlockNoRoomError("Not enough room");
-
-    if (new_size > old_size){
-        u16 shift_loc = new_size - old_size;
-        u16 new_loc = old_loc - shift_loc;
-
-
-        memcpy(this->address(new_loc), data.get_data(), new_size);
-        put_header(record_id, new_size, new_loc);
-
-        if (record_id == this->num_records){
-            this->end_free -= shift_loc;
-        } else {
-            slide(record_id + 1, shift_loc);
-        }
+    // if (!have_record(record_id))
+    //     throw DbBlockError("Record not found");
+    //
+    // u16 old_size;
+    // u16 old_loc;
+    //
+    // get_header(old_size, old_loc, record_id);
+    //
+    // u16 new_size = (u16)data.get_size();
+    //
+    // if (new_size > old_size && !has_room(new_size - old_size))
+    //     throw DbBlockNoRoomError("Not enough room");
+    //
+    // if (new_size > old_size){
+    //     u16 shift_loc = new_size - old_size;
+    //     u16 new_loc = old_loc - shift_loc;
+    //
+    //
+    //     memcpy(this->address(new_loc), data.get_data(), new_size);
+    //     put_header(record_id, new_size, new_loc);
+    //
+    //     if (record_id == this->num_records){
+    //         this->end_free -= shift_loc;
+    //     } else {
+    //         slide(record_id + 1, shift_loc);
+    //     }
+    // }
+    // else{
+    //     u16 shift_loc = old_size - new_size;
+    //     u16 new_loc = old_loc + shift_loc;
+    //
+    //
+    //     memcpy(this->address(old_loc), data.get_data(), new_size);
+    //     put_header(record_id, new_size, new_loc);
+    //
+    //     if (record_id == this->num_records){
+    //         this->end_free += shift_loc;
+    //     } else {
+    //         slide(record_id + 1, shift_loc, false);
+    //     }
+    // }
+    u16 size, loc;
+    get_header(size, loc, record_id);
+    u16 new_size = (u16) data.get_size();
+    if (new_size > size) {
+        u16 extra = new_size - size;
+        if (!has_room(extra))
+  		      throw DbBlockNoRoomError("not enough room for enlarged record");
+	      slide(loc, loc - extra);
+	      memcpy(this->address(loc-extra), data.get_data(), new_size);
+    } else {
+	        memcpy(this->address(loc), data.get_data(), new_size);
+          slide(loc+new_size, loc+size);
     }
-    else{
-        u16 shift_loc = old_size - new_size;
-        u16 new_loc = old_loc + shift_loc;
-
-
-        memcpy(this->address(old_loc), data.get_data(), new_size);
-        put_header(record_id, new_size, new_loc);
-
-        if (record_id == this->num_records){
-            this->end_free += shift_loc;
-        } else {
-            slide(record_id + 1, shift_loc, false);
-        }
-    }
+    get_header(size, loc, record_id);
+    put_header(record_id, new_size, loc);
 }
 
 /**
@@ -125,18 +140,21 @@ void SlottedPage::put(RecordID record_id, const Dbt &data) throw(DbBlockNoRoomEr
  * @Author  sprint 1 group
  */
 void SlottedPage::del(RecordID record_id){
-    if (!have_record(record_id))
-        throw DbBlockError("Record not found");
+    //if (!have_record(record_id))
+    //    throw DbBlockError("Record not found");
 
     u16 size, loc;
     get_header(size, loc, record_id);
     put_header(record_id, 0U, 0U);
 
-    if (record_id == this->num_records){
-        this->end_free += size;
-    } else {
-        slide(record_id + 1, size, false);
-    }
+
+
+    slide(loc, loc+size);
+    //if (record_id == this->num_records){
+    //    this->end_free += size;
+    //} else {
+        //slide(record_id + 1, size, false);
+    //}
 }
 
 /**
@@ -198,40 +216,68 @@ bool SlottedPage::has_room(u16 size) const {
     return 4 * this->num_records + 4 <= this->end_free - size;
 }
 
-// Author   sprint 1 group
-void SlottedPage::slide(RecordID start_record_id, u16 offset, bool left){
-    while (start_record_id <= this->num_records && !have_record(start_record_id)){
-        start_record_id++;
-    }
-    if (start_record_id > this->num_records){
+// // Author   sprint 1 group
+// void SlottedPage::slide(RecordID start_record_id, u16 offset, bool left){
+//     while (start_record_id <= this->num_records && !have_record(start_record_id)){
+//         start_record_id++;
+//     }
+//     if (start_record_id > this->num_records){
+//         return;
+//     }
+//     u16 begin_offset, begin_size;
+//     get_header(begin_size, begin_offset, start_record_id);
+//     u16 shift_block_size = begin_offset + begin_size - 1 - this->end_free;
+//     char temperary[shift_block_size];
+//     memcpy(temperary, this->address(this->end_free + 1), shift_block_size);
+//
+//     if (left){
+//         memcpy(this->address(this->end_free + 1 - offset), temperary, shift_block_size);
+//     }
+//     else{
+//         memcpy(this->address(this->end_free + 1 + offset), temperary, shift_block_size);
+//     }
+//     for (RecordID i = start_record_id; i <= this->num_records; i++){
+//         if (have_record(i)){
+//             u16 temp_offset, temp_size;
+//             get_header(temp_size, temp_offset, i);
+//
+//             if (left){
+//                 put_header(i, temp_size, temp_offset - offset);
+//             }
+//             else{
+//                 put_header(i, temp_size, temp_offset + offset);
+//             }
+//         }
+//     }
+//     this->end_free = left ? this->end_free - offset : this->end_free + offset;
+//     put_header();
+// }
+
+void SlottedPage::slide(u16 start, u16 end) {
+    int shift = end - start;
+    if (shift == 0)
         return;
-    }
-    u16 begin_offset, begin_size;
-    get_header(begin_size, begin_offset, start_record_id);
-    u16 shift_block_size = begin_offset + begin_size - 1 - this->end_free;
-    char temperary[shift_block_size];
-    memcpy(temperary, this->address(this->end_free + 1), shift_block_size);
 
-    if (left){
-        memcpy(this->address(this->end_free + 1 - offset), temperary, shift_block_size);
-    }
-    else{
-        memcpy(this->address(this->end_free + 1 + offset), temperary, shift_block_size);
-    }
-    for (RecordID i = start_record_id; i <= this->num_records; i++){
-        if (have_record(i)){
-            u16 temp_offset, temp_size;
-            get_header(temp_size, temp_offset, i);
+    // slide data
+    void *to = this->address((u16)(this->end_free + 1 + shift));
+    void *from = this->address((u16)(this->end_free + 1));
+    int bytes = start - (this->end_free + 1U);
+    char temp[bytes];
+    memcpy(temp, from, bytes);
+    memcpy(to, temp, bytes);
 
-            if (left){
-                put_header(i, temp_size, temp_offset - offset);
-            }
-            else{
-                put_header(i, temp_size, temp_offset + offset);
-            }
-        }
-    }
-    this->end_free = left ? this->end_free - offset : this->end_free + offset;
+    // fix up headers
+    RecordIDs* record_ids = ids();
+	for (auto const& record_id : *record_ids) {
+		u16 size, loc;
+		get_header(size, loc, record_id);
+		if (loc <= start) {
+			loc += shift;
+			put_header(record_id, size, loc);
+		}
+	}
+    delete record_ids;
+    this->end_free += shift;
     put_header();
 }
 
