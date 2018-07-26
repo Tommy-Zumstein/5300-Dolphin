@@ -4,7 +4,7 @@
  * @see "Seattle University, CPSC5300, Summer 2018"
  */
 #include "schema_tables.h"
-#include "ParseTreeToString.h"
+//#include "ParseTreeToString.h"
 
 
 void initialize_schema_tables() {
@@ -18,8 +18,8 @@ void initialize_schema_tables() {
 
 // Not terribly useful since the parser weeds most of these out
 bool is_acceptable_identifier(Identifier identifier) {
-    if (ParseTreeToString::is_reserved_word(identifier))
-        return true;
+    //if (ParseTreeToString::is_reserved_word(identifier))
+    //    return true;
     try {
         std::stoi(identifier);
         return false;
@@ -220,4 +220,3 @@ Handle Columns::insert(const ValueDict* row) {
 
     return HeapTable::insert(row);
 }
-
