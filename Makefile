@@ -9,7 +9,7 @@ OBJS        = shellparser.o heap_storage.o SQLExec.o schema_tables.o storage_eng
 
 # Rule for linking to create the executable
 shellparser: $(OBJS)
-    g++ -L$(LIB_DIR) -o $@ $(OBJS) -ldb_cxx -lsqlparser
+	g++ -L$(LIB_DIR) -o $@ $(OBJS) -ldb_cxx -lsqlparser
 
 # In addition to the general .cpp to .o rule below, we need to note any header dependencies here
 # idea here is that if any of the included header files changes, we have to recompile
@@ -24,7 +24,7 @@ shellparser.o : $(SQLEXEC_H)
 
 # General rule for compilation
 %.o: %.cpp
-    g++ -I$(INCLUDE_DIR) $(CCFLAGS) -o "$@" "$<"
+	g++ -I$(INCLUDE_DIR) $(CCFLAGS) -o "$@" "$<"
 
 # Rule for removing all non-source files
 clean:
