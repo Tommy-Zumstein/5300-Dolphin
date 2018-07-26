@@ -62,7 +62,7 @@ protected:
 
 	// FIXME: Functions from Sprint 1
 	//virtual void ensure_record_exist(RecordID record_id) throw (DbBlockError);
-	virtual bool have_record(RecordID record_id) const;
+	//virtual bool have_record(RecordID record_id) const;
 
 };
 
