@@ -89,6 +89,8 @@ public:
         if (expr == nullptr) {
             operatorExpression = "null";
         }
+        if (expr->opType == Expr::NOT)
+            operatorExpression += "NOT ";
         // Left-hand side of expression
         operatorExpression += printExpression(expr->expr) + " ";
         switch (expr->opType) {
@@ -96,15 +98,13 @@ public:
             operatorExpression += expr->opChar;
             break;
         case Expr::AND:
-            operatorExpression = "AND";
+            operatorExpression += "AND";
             break;
         case Expr::OR:
-            operatorExpression = "OR";
-            break;
-        case Expr::NOT:
-            operatorExpression = "NOT";
+            operatorExpression += "OR";
             break;
         default:
+            operatorExpression += "???";
             break;
         }
         // Right-hand side of expression
@@ -149,8 +149,7 @@ public:
             expression += printOperatorExpression(expr);
             break;
         default:
-            std::cerr << "Unrecognized expression type " << expr->type
-                      << std::endl;
+            expression += "???";
             break;
         }
         if (expr->alias != nullptr) {
@@ -168,9 +167,6 @@ public:
     static string columnDefinitionToString(const ColumnDefinition *col) {
         string columnDef(col->name);
         switch (col->type) {
-        case ColumnDefinition::DOUBLE:
-            columnDef += " DOUBLE";
-            break;
         case ColumnDefinition::INT:
             columnDef += " INT";
             break;
@@ -191,20 +187,34 @@ public:
      */
     static string executeCreateStatement(const CreateStatement *stmt) {
         string statement = "CREATE ";
-        if (stmt->type != CreateStatement::kTable)
-            return statement + "...";
-        statement += "TABLE ";
-        if (stmt->ifNotExists)
-            statement += "IF NOT EXISTS ";
-        statement += string(stmt->tableName) + " (";
-        int comma = 0;
-        for (ColumnDefinition *col : *stmt->columns) {
-            if (comma == 1)
-                statement += ", ";
-            statement += columnDefinitionToString(col);
-            comma = 1;
+        if (stmt->type == CreateStatement::kTable) {
+            statement += "TABLE ";
+            if (stmt->ifNotExists)
+                statement += "IF NOT EXISTS ";
+            statement += string(stmt->tableName) + " (";
+            int comma = 0;
+            for (ColumnDefinition *col : *stmt->columns) {
+                if (comma == 1)
+                    statement += ", ";
+                statement += columnDefinitionToString(col);
+                comma = 1;
+            }
+            statement += ")";
+        } else if (stmt->type == CreateStatement::kIndex) {
+            statement += "INDEX ";
+            statement += string(stmt->indexName) + "ON ";
+            statement += string(stmt->tableName) + "USING " + stmt->IndexType + " (";
+            int comma = 0;
+            for (auto const& col: *stmt->indexColumns) {
+                if (comma == 1)
+                    statement += ", ";
+                statement += string(col);
+                comma = 1;
+            }
+            statement += ")";
+        } else {
+            statement += "...";
         }
-        statement += ")";
         return statement;
     }
 
@@ -253,6 +263,9 @@ public:
         case DropStatement::kTable:
             statement += "TABLE ";
             break;
+        case DropStatment::kIndex:
+            statement += string("INDEX ") + stmt->indexName + " FROM ";
+            break;
         default:
             statement += "? ";
         }
@@ -273,6 +286,9 @@ public:
             break;
         case ShowStatement::kColumns:
             statement += string("COLUMNS FROM ") + stmt->tableName;
+            break;
+        case ShowStatement::kIndex:
+            statement += string("INDEX FROM ") + stmt->tableName;
             break;
         default:
             statement += "?";
