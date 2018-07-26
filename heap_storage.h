@@ -51,10 +51,9 @@ protected:
 	virtual void get_header(u_int16_t &size, u_int16_t &loc, RecordID id=0) const;
 	virtual void put_header(RecordID id=0, u_int16_t size=0, u_int16_t loc=0);
 	virtual bool has_room(u_int16_t size) const;
-	virtual void slide(uint16_t start, uint16_t end);
 
 	// FIXME: Modified function
-	//virtual void slide(RecordID start_record_id, u_int16_t offset, bool left = true);
+	virtual void slide(RecordID start_record_id, u_int16_t offset, bool left = true);
 
 	virtual u_int16_t get_n(u_int16_t offset) const;
 	virtual void put_n(u_int16_t offset, u_int16_t n);
@@ -62,7 +61,7 @@ protected:
 
 	// FIXME: Functions from Sprint 1
 	//virtual void ensure_record_exist(RecordID record_id) throw (DbBlockError);
-	//virtual bool have_record(RecordID record_id) const;
+	virtual bool have_record(RecordID record_id) const;
 
 };
 
