@@ -48,7 +48,7 @@ public:
      * @param column_attributes  returned by reference: list of corresponding
      *                           attributes for column_names
      */
-    virtual void get_columns(Identifier table_name, ColumnNames &column_names, ColumnAttributes &column_attributes);
+    static void get_columns(Identifier table_name, ColumnNames &column_names, ColumnAttributes &column_attributes);
 
     /**
      * Get the correctly instantiated DbRelation for a given table.
