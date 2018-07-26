@@ -348,9 +348,9 @@ BlockIDs *HeapFile::block_ids() const {
 
 // Get the number of blocks in the file
 uint32_t HeapFile::get_block_count() {
-  DB_BTREE_STAT* stat;
-  this->db.stat(nullptr, &stat, DB_FAST_STAT);
-  return stat->bt_ndata;
+    DB_BTREE_STAT* stat;
+    this->db.stat(nullptr, &stat, DB_FAST_STAT);
+    return stat->bt_ndata;
 }
 
 // Open the database file, and set dbenv parameters
@@ -436,7 +436,7 @@ Handle HeapTable::insert(const ValueDict *row) {
 
 // Not implemented, next sprint
 void HeapTable::update(const Handle handle, const ValueDict *new_values) {
-  throw DbRelationError("Not implemented");
+    throw DbRelationError("Not implemented");
 }
 
 /**
@@ -573,9 +573,9 @@ Handle HeapTable::append(const ValueDict *row) {
     }
     this->file.put(block);
     Handle handle = std::make_pair(this->file.get_last_block_id(), id);
-	  delete block;
-	  free(data->get_data());
-	  delete data;
+    delete block;
+    free(data->get_data());
+    delete data;
     return handle;
 }
 
@@ -628,7 +628,7 @@ ValueDict *HeapTable::unmarshal(Dbt *data) const {
             row->insert(std::pair<Identifier, Value>(column_name, Value(n)));
             offset += sizeof(int32_t);
         }
-        else if (ca.get_data_type() == ColumnAttribute::DataType::TEXT){
+        else if (ca.get_data_type() == ColumnAttribute::DataType::TEXT) {
             u16 size = *(u16 *)(bytes + offset);
             offset += sizeof(u16);
             char buffer[DbBlock::BLOCK_SZ];
@@ -637,8 +637,7 @@ ValueDict *HeapTable::unmarshal(Dbt *data) const {
             buffer[size] = '\0';
             row->insert(std::pair<Identifier, Value>(column_name, Value(buffer)));
             offset += size;
-        }
-        else{
+        } else {
             throw DbRelationError("Only know how to marshal INT and TEXT");
         }
     }
@@ -650,56 +649,56 @@ bool HeapTable::selected(Handle handle, const ValueDict* where) {
     if (where == nullptr)
         return true;
     ValueDict* row = this->project(handle, where);
-	  return *row == *where;
+    return *row == *where;
 }
 
 void test_set_row(ValueDict &row, int a, string b) {
-	  row["a"] = Value(a);
-	  row["b"] = Value(b);
+    row["a"] = Value(a);
+    row["b"] = Value(b);
 }
 
 bool test_compare(DbRelation &table, Handle handle, int a, string b) {
-	  ValueDict *result = table.project(handle);
-	  Value value = (*result)["a"];
-	  if (value.n != a) {
-		    delete result;
-		    return false;
-	  }
-	  value = (*result)["b"];
-	  delete result;
-	  return !(value.s != b);
+    ValueDict *result = table.project(handle);
+    Value value = (*result)["a"];
+    if (value.n != a) {
+      delete result;
+      return false;
+    }
+    value = (*result)["b"];
+    delete result;
+    return !(value.s != b);
 }
 
 // test function -- returns true if all tests pass
 bool test_heap_storage() {
-	  ColumnNames column_names;
-	  column_names.push_back("a");
-	  column_names.push_back("b");
-	  ColumnAttributes column_attributes;
-	  ColumnAttribute ca(ColumnAttribute::INT);
-	  column_attributes.push_back(ca);
-	  ca.set_data_type(ColumnAttribute::TEXT);
-	  column_attributes.push_back(ca);
+    ColumnNames column_names;
+    column_names.push_back("a");
+    column_names.push_back("b");
+    ColumnAttributes column_attributes;
+    ColumnAttribute ca(ColumnAttribute::INT);
+    column_attributes.push_back(ca);
+    ca.set_data_type(ColumnAttribute::TEXT);
+    column_attributes.push_back(ca);
     HeapTable table1("_test_create_drop_cpp", column_names, column_attributes);
-	  cout << "test_heap_storage: " << endl;
+    cout << "test_heap_storage: " << endl;
     table1.create();
     cout << "create ok" << endl;
     // drop makes the object unusable because of BerkeleyDB restriction
     table1.drop();
     cout << "drop ok" << endl;
-	  HeapTable table("_test_data_cpp", column_names, column_attributes);
+    HeapTable table("_test_data_cpp", column_names, column_attributes);
     table.create_if_not_exists();
     cout << "create_if_not_exsts ok" << endl;
     ValueDict row;
-	  string b = "alkjsl;kj; as;lkj;alskjf;laalsdfkjads;lfkj a;sldfkj a;sdlfjk a";
-	  test_set_row(row, -1, b);
+    string b = "alkjsl;kj; as;lkj;alskjf;laalsdfkjads;lfkj a;sldfkj a;sdlfjk a";
+    test_set_row(row, -1, b);
     table.insert(&row);
     cout << "insert ok" << endl;
     Handles* handles = table.select();
     if (!test_compare(table, (*handles)[0], -1, b))
         return false;
     cout << "select/project ok " << handles->size() << endl;
-	  delete handles;
+    delete handles;
     Handle last_handle;
     for (int i = 0; i < 1000; i++) {
         test_set_row(row, i, b);
@@ -713,7 +712,7 @@ bool test_heap_storage() {
         if (!test_compare(table, handle, i++, b))
             return false;
     cout << "many inserts/select/projects ok" << endl;
-	  delete handles;
+    delete handles;
     table.del(last_handle);
     handles = table.select();
     if (handles->size() != 1000)
@@ -724,6 +723,6 @@ bool test_heap_storage() {
             return false;
     cout << "del ok" << endl;
     table.drop();
-	  delete handles;
+    delete handles;
     return true;
 }

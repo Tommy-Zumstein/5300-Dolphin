@@ -11,7 +11,7 @@
 
 /**
  * Initialize access to the schema tables.
- * Must be called before anything else is done with any of the schema 
+ * Must be called before anything else is done with any of the schema
  * data structures.
  */
 void initialize_schema_tables();
@@ -26,47 +26,47 @@ class Columns; // forward declare
  */
 class Tables : public HeapTable {
 public:
-	/**
-	 * Name of the tables table ("_tables")
-	 */
+    /**
+     * Name of the tables table ("_tables")
+     */
     static const Identifier TABLE_NAME;
 
-	// ctor/dtor
+    // ctor/dtor
     Tables();
     virtual ~Tables() {}
 
-	// HeapTable overrides
+    // HeapTable overrides
     virtual void create();
     virtual Handle insert(const ValueDict* row);
     virtual void del(Handle handle);
 
-	/**
-	 * Get the columns and their attributes for a given table.
-	 * @param table_name         table to get column info for
-	 * @param column_names       returned by reference: list of column names 
-	 *                           for table_name
-	 * @param column_attributes  returned by reference: list of corresponding 
-	 *                           attributes for column_names
-	 */
+    /**
+     * Get the columns and their attributes for a given table.
+     * @param table_name         table to get column info for
+     * @param column_names       returned by reference: list of column names
+     *                           for table_name
+     * @param column_attributes  returned by reference: list of corresponding
+     *                           attributes for column_names
+     */
     virtual void get_columns(Identifier table_name, ColumnNames &column_names, ColumnAttributes &column_attributes);
 
-	/**
-	 * Get the correctly instantiated DbRelation for a given table.
-	 * @param table_name  table to get
-	 * @returns           instantiated DbRelation of the correct type
-	 */
+    /**
+     * Get the correctly instantiated DbRelation for a given table.
+     * @param table_name  table to get
+     * @returns           instantiated DbRelation of the correct type
+     */
     virtual DbRelation& get_table(Identifier table_name);
 
 protected:
-	// hard-coded columns for _tables table
+    // hard-coded columns for _tables table
     static ColumnNames& COLUMN_NAMES();
     static ColumnAttributes& COLUMN_ATTRIBUTES();
 
-	// keep a reference to the columns table (for get_columns method)
+    // keep a reference to the columns table (for get_columns method)
     static Columns* columns_table;
 
 private:
-	// keep a cache of all the tables we've instantiated so far
+    // keep a cache of all the tables we've instantiated so far
     static std::map<Identifier,DbRelation*> table_cache;
 };
 
@@ -76,22 +76,21 @@ private:
  */
 class Columns : public HeapTable {
 public:
-	/**
-	 * Name of the columns table ("_columns")
-	 */
+    /**
+     * Name of the columns table ("_columns")
+     */
     static const Identifier TABLE_NAME;
 
-	// ctor/dtor
+    // ctor/dtor
     Columns();
     virtual ~Columns() {}
 
-	// HeapTable overrides
+    // HeapTable overrides
     virtual void create();
     virtual Handle insert(const ValueDict* row);
 
 protected:
-	// hard-coded columns for the _columns table
+    // hard-coded columns for the _columns table
     static ColumnNames& COLUMN_NAMES();
     static ColumnAttributes& COLUMN_ATTRIBUTES();
 };
-

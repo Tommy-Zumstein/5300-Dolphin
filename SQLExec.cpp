@@ -69,14 +69,14 @@ QueryResult *SQLExec::execute(const SQLStatement *statement)
     try {
         // for now, we only have three cases, create, drop, and show
         switch (statement->type()) {
-            case kStmtCreate:
-                return create((const CreateStatement *) statement);
-            case kStmtDrop:
-                return drop((const DropStatement *) statement);
-            case kStmtShow:
-                return show((const ShowStatement *) statement);
-            default:
-                return new QueryResult("not implemented");
+        case kStmtCreate:
+            return create((const CreateStatement *) statement);
+        case kStmtDrop:
+            return drop((const DropStatement *) statement);
+        case kStmtShow:
+            return show((const ShowStatement *) statement);
+        default:
+            return new QueryResult("not implemented");
         }
     } catch (DbRelationError& e) {
         throw SQLExecError(string("DbRelationError: ") + e.what());
@@ -90,14 +90,14 @@ void SQLExec::column_definition(const ColumnDefinition *col,
     column_name = col->name;
     // for now, we only have two data types, INT and TEXT
     switch (col->type) {
-        case ColumnDefinition::INT:
-            column_attribute.set_data_type(ColumnAttribute::INT);
-            break;
-        case ColumnDefinition::TEXT:
-            column_attribute.set_data_type(ColumnAttribute::TEXT);
-            break;
-        default:
-            throw SQLExecError("not implemented");
+    case ColumnDefinition::INT:
+        column_attribute.set_data_type(ColumnAttribute::INT);
+        break;
+    case ColumnDefinition::TEXT:
+        column_attribute.set_data_type(ColumnAttribute::TEXT);
+        break;
+    default:
+        throw SQLExecError("not implemented");
     }
 }
 
@@ -141,7 +141,7 @@ QueryResult *SQLExec::create(const CreateStatement *statement) {
                 row["column_name"] = column_names[i];
                 if (column_attributes[i].get_data_type() == ColumnAttribute::INT) {
                     row["data_type"] = Value("INT");
-                } else if (column_attributes[i].get_data_type() == ColumnAttribute::TEXT){
+                } else if (column_attributes[i].get_data_type() == ColumnAttribute::TEXT) {
                     row["data_type"] = Value("TEXT");
                 }
                 // insert each handle to temporally column handles vector
@@ -214,12 +214,12 @@ QueryResult *SQLExec::drop(const DropStatement *statement) {
 QueryResult *SQLExec::show(const ShowStatement *statement) {
     // For now, we only have two show types, show tables and show columns
     switch (statement->type) {
-        case ShowStatement::kTables:
-            return show_tables();
-        case ShowStatement::kColumns:
-            return show_columns(statement);
-        default:
-            throw SQLExecError("unrecognized SHOW type");
+    case ShowStatement::kTables:
+        return show_tables();
+    case ShowStatement::kColumns:
+        return show_columns(statement);
+    default:
+        throw SQLExecError("unrecognized SHOW type");
     }
 }
 
@@ -291,7 +291,7 @@ QueryResult *SQLExec::show_columns(const ShowStatement *statement) {
 
     // handle memory leak
     delete handles;
-	  return new QueryResult(name_keys, attribute_key, rows,
+    return new QueryResult(name_keys, attribute_key, rows,
                            "successfully returned " + to_string(row_size) +
                            " rows");
 }

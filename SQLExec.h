@@ -1,5 +1,5 @@
 /**
- * @file SQLExec.h - SQLExec class 
+ * @file SQLExec.h - SQLExec class
  * @author Kevin Lundeen
  * @see "Seattle University, CPSC5300, Summer 2018"
  */
@@ -53,30 +53,29 @@ protected:
  */
 class SQLExec {
 public:
-	/**
-	 * Execute the given SQL statement.
-	 * @param statement   the Hyrise AST of the SQL statement to execute
-	 * @returns           the query result (freed by caller)
-	 */
+    /**
+     * Execute the given SQL statement.
+     * @param statement   the Hyrise AST of the SQL statement to execute
+     * @returns           the query result (freed by caller)
+     */
     static QueryResult *execute(const hsql::SQLStatement *statement) throw(SQLExecError);
 
 protected:
-	// the one place in the system that holds the _tables table
+    // the one place in the system that holds the _tables table
     static Tables *tables;
 
-	// recursive decent into the AST
+    // recursive decent into the AST
     static QueryResult *create(const hsql::CreateStatement *statement);
     static QueryResult *drop(const hsql::DropStatement *statement);
     static QueryResult *show(const hsql::ShowStatement *statement);
     static QueryResult *show_tables();
     static QueryResult *show_columns(const hsql::ShowStatement *statement);
 
-	/**
-	 * Pull out column name and attributes from AST's column definition clause
-	 * @param col                AST column definition
-	 * @param column_name        returned by reference
-	 * @param column_attributes  returned by reference
-	 */
+    /**
+     * Pull out column name and attributes from AST's column definition clause
+     * @param col                AST column definition
+     * @param column_name        returned by reference
+     * @param column_attributes  returned by reference
+     */
     static void column_definition(const hsql::ColumnDefinition *col, Identifier &column_name, ColumnAttribute &column_attribute);
 };
-
