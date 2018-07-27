@@ -328,12 +328,18 @@ QueryResult *SQLExec::drop_index(const DropStatement *statement) {
     where["table_name"] = Value(table_name);
     where["index_name"] = Value(index_name);
 
-    Handles* index_handles = SQLExec::indices->select(&where);
-    for (auto const& handle: *index_handles) {
-        SQLExec::indices->del(handle);
-    }
+    // remove from _columns schema
+    DbRelation& columns = SQLExec::tables->get_table(Columns::TABLE_NAME);
+    Handles* handles = columns.select(&where);
+    for (auto const& handle: *handles)
+        columns.del(handle);
+    delete handles;
+
     index.drop();
-    delete index_handles;
+
+    // finally, remove from _tables schema
+    SQLExec::indices->del(*SQLExec::indices->select(&where)->begin()); // expect only one row from select
+
     //Todo remove from cache?
     return new QueryResult("dropped index: " + index_name);
 }
