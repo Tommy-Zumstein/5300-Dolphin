@@ -192,15 +192,15 @@ QueryResult *SQLExec::create_index(const CreateStatement *statement) {
 
     Identifier table_name = statement->tableName;
     Identifier index_name = statement->indexName;
-    Identifier index_type;
-    bool is_unique;
 
+    Identifier index_type;
     try {
         index_type = statement->indexType;
     } catch (exception& e) {
         index_type = "BTREE";
     }
 
+    bool is_unique;
     if (index_type == "BTREE") {
         is_unique = true;
     } else {
@@ -209,30 +209,45 @@ QueryResult *SQLExec::create_index(const CreateStatement *statement) {
 
     ValueDict row;
     row["table_name"] = table_name;
-    row["index_name"] = index_name;
-    row["seq_in_index"] = 1;
-    row["index_type"] = index_type;
-    row["is_unique"] = is_unique;
+    Handle t_handle = SQLExec::tables->insert(&row);
+    try {
+        row["index_name"] = index_name;
+        row["seq_in_index"] = 0;
+        row["index_type"] = index_type;
+        row["is_unique"] = is_unique;
 
-    ColumnAttributes column_attributes;
-    Identifier column_name;
-    ColumnAttribute column_attribute;
-    for (ColumnDefinition *col : *statement->columns) {
-        column_definition(col, column_name, column_attribute);
-        row["seq_in_index"].n++;
-        row["column_name"] = column_name;
+        Identifier column_name;
+        ColumnNames column_names;
+        ColumnAttribute column_attribute;
+        Handles i_handles;
+        try {
+            for (ColumnDefinition *col: *statement->columns) {
+                column_definition(col, column_name, column_attribute);
+                row["seq_in_index"].n++;
+                row["column_name"] = column_name;
+                i_handles.push_back(SQLExec::indices->insert(&row));
+            }
 
-        //_indices.push_back(&row);
-        SQLExec::indices->insert(&row);
+            //get_index takes care of caching
+            //DbRelation& index = _indices->get_table(table_name, index_name);
+            DbIndex& index = SQLExec::indices->get_index(table_name, index_name);
+            if (statement->ifNotExists)
+                index.create_if_not_exists();
+            else
+                index.create();
+        } catch (exception& e) {
+            try {
+                for (auto const &handle: i_handles)
+                    indices.del(handle);
+            } catch (...) {}
+            throw;
+        }
+    } catch (exception& e) {
+        try {
+            SQLExec::tables->del(t_handle);
+        } catch (...) {}
+        throw;
     }
-
-    //get_index takes care of caching
-    //DbRelation& index = _indices->get_table(table_name, index_name);
-    DbIndex& index = SQLExec::indices->get_index(table_name, index_name);
-
-    //todo - should we check if this already exists before creating?
-    index.create();
-
     return new QueryResult("created " + index_name);
 }
 
