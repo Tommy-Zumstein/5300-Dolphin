@@ -202,8 +202,8 @@ public:
             statement += ")";
         } else if (stmt->type == CreateStatement::kIndex) {
             statement += "INDEX ";
-            statement += string(stmt->indexName) + "ON ";
-            statement += string(stmt->tableName) + "USING " + stmt->indexType + " (";
+            statement += string(stmt->indexName) + " ON ";
+            statement += string(stmt->tableName) + " USING " + stmt->indexType + " (";
             int comma = 0;
             for (auto const& col: *stmt->indexColumns) {
                 if (comma == 1)
