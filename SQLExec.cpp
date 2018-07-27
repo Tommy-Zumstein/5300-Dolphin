@@ -99,6 +99,8 @@ void SQLExec::column_definition(const ColumnDefinition *col,
     case ColumnDefinition::TEXT:
         column_attribute.set_data_type(ColumnAttribute::TEXT);
         break;
+    case ColumnDefinition::BOOLEAN:
+        column_attribute.set_data_type(ColumnAttribute::BOOLEAN);
     case ColumnDefinition::DOUBLE:
     default:
         throw SQLExecError("not implemented");
@@ -193,8 +195,7 @@ QueryResult *SQLExec::create_index(const CreateStatement *statement) {
     Identifier table_name = statement->tableName;
     Identifier index_name = statement->indexName;
     Identifier index_type;
-    bool is_unique = true;
-    //DbRelation& _indices = SQLExec::tables->get_table(Indices::TABLE_NAME );
+    bool is_unique;
 
     try {
         index_type = statement->indexType;
@@ -202,29 +203,19 @@ QueryResult *SQLExec::create_index(const CreateStatement *statement) {
         index_type = "BTREE";
     }
 
-    /*
-    try {
-        is_unique = statement->is_unique;
-    } catch (exception& e) {
-        is_unique= false;
+    if (index_type == "BTREE") {
+        is_unique = true;
+    } else {
+        is_unique = false;
     }
-    */
-    if(index_type == "HASH") is_unique = false;
 
     ValueDict row;
     row["table_name"] = table_name;
     row["index_name"] = index_name;
-    row["seq_in_index"] = 0; //TODO what is seq_in_index?
+    row["seq_in_index"] = 1;
     row["index_type"] = index_type;
     row["is_unique"] = is_unique;
 
-    /*
-    for (ColumnDefinition *col : *statement->columns) {
-        column_definition(col, column_name, column_attribute);
-        column_names.push_back(column_name);
-        column_attributes.push_back(column_attribute);
-    }
-    */
     ColumnAttributes column_attributes;
     Identifier column_name;
     ColumnAttribute column_attribute;
