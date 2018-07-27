@@ -429,6 +429,7 @@ QueryResult *SQLExec::show_columns(const ShowStatement *statement) {
 
 // Exectue SHOW statement for indices
 QueryResult *SQLExec::show_index(const ShowStatement *statement) {
+    Identifier table_name = statement->tableName;
     // to hold column names for schema table:
     // table_name, column_name, data_type
     ColumnNames* name_keys = new ColumnNames;
@@ -445,7 +446,7 @@ QueryResult *SQLExec::show_index(const ShowStatement *statement) {
 
     // to hold target location
     ValueDict target;
-    target["table_name"] = Value(statement->tableName);
+    target["table_name"] = Value(table_name);
 
     // to hold handles for all indices
     Handles* handles = SQLExec::indices->select(&target);
