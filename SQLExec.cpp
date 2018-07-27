@@ -99,8 +99,6 @@ void SQLExec::column_definition(const ColumnDefinition *col,
     case ColumnDefinition::TEXT:
         column_attribute.set_data_type(ColumnAttribute::TEXT);
         break;
-    case ColumnDefinition::BOOLEAN:
-        column_attribute.set_data_type(ColumnAttribute::BOOLEAN);
     case ColumnDefinition::DOUBLE:
     default:
         throw SQLExecError("not implemented");
