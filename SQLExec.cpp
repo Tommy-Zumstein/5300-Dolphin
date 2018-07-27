@@ -231,14 +231,11 @@ QueryResult *SQLExec::create_index(const CreateStatement *statement) {
             //get_index takes care of caching
             //DbRelation& index = _indices->get_table(table_name, index_name);
             DbIndex& index = SQLExec::indices->get_index(table_name, index_name);
-            if (statement->ifNotExists)
-                index.create_if_not_exists();
-            else
-                index.create();
+            index.create();
         } catch (exception& e) {
             try {
                 for (auto const &handle: i_handles)
-                    indices.del(handle);
+                    indices->del(handle);
             } catch (...) {}
             throw;
         }
