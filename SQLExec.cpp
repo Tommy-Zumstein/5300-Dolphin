@@ -10,6 +10,7 @@ using namespace hsql;
 
 // define static data
 Tables* SQLExec::tables = nullptr;
+Indices* SQLExec::indicies = nullptr;
 
 // make query result be printable
 ostream &operator<<(ostream &out, const QueryResult &qres) {
@@ -324,21 +325,16 @@ QueryResult *SQLExec::drop_index(const DropStatement *statement) {
     // get the index
     DbIndex& index = SQLExec::indices->get_index(table_name, index_name);
 
-    ValueDict where;
-    where["table_name"] = Value(table_name);
-    where["index_name"] = Value(index_name);
+    ValueDict target;
+    target["table_name"] = Value(table_name);
+    target["index_name"] = Value(index_name);
 
-    // remove from _columns schema
-    DbRelation& columns = SQLExec::tables->get_table(Columns::TABLE_NAME);
-    Handles* handles = columns.select(&where);
-    for (auto const& handle: *handles)
-        columns.del(handle);
-    delete handles;
-
+    Handles* index_handles = SQLExec::indices->select(&target);
+    for (auto const& handle: *index_handles) {
+        SQLExec::indices->del(handle);
+    }
     index.drop();
-
-    // finally, remove from _tables schema
-    SQLExec::indices->del(*SQLExec::indices->select(&where)->begin()); // expect only one row from select
+    delete index_handles;
 
     //Todo remove from cache?
     return new QueryResult("dropped index: " + index_name);
@@ -436,6 +432,7 @@ QueryResult *SQLExec::show_columns(const ShowStatement *statement) {
 // Exectue SHOW statement for indices
 QueryResult *SQLExec::show_index(const ShowStatement *statement) {
     Identifier table_name = statement->tableName;
+
     // to hold column names for schema table:
     // table_name, column_name, data_type
     ColumnNames* name_keys = new ColumnNames;
@@ -448,7 +445,9 @@ QueryResult *SQLExec::show_index(const ShowStatement *statement) {
 
     // to hold attribute TEXT
     ColumnAttributes* attribute_key = new ColumnAttributes;
-    attribute_key->push_back(ColumnAttribute(ColumnAttribute::TEXT));
+    attribute_keys->push_back(ColumnAttribute(ColumnAttribute::TEXT));
+    attribute_keys->push_back(ColumnAttribute(ColumnAttribute::INT));
+    attribute_keys->push_back(ColumnAttribute(ColumnAttribute::BOOLEAN));
 
     // to hold target location
     ValueDict target;
