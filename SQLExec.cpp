@@ -10,7 +10,7 @@ using namespace hsql;
 
 // define static data
 Tables* SQLExec::tables = nullptr;
-Indices* SQLExec::indicies = nullptr;
+Indices* SQLExec::indices = nullptr;
 
 // make query result be printable
 ostream &operator<<(ostream &out, const QueryResult &qres) {
@@ -444,7 +444,7 @@ QueryResult *SQLExec::show_index(const ShowStatement *statement) {
     name_keys->push_back("is_unique");
 
     // to hold attribute TEXT
-    ColumnAttributes* attribute_key = new ColumnAttributes;
+    ColumnAttributes* attribute_keys = new ColumnAttributes;
     attribute_keys->push_back(ColumnAttribute(ColumnAttribute::TEXT));
     attribute_keys->push_back(ColumnAttribute(ColumnAttribute::INT));
     attribute_keys->push_back(ColumnAttribute(ColumnAttribute::BOOLEAN));
@@ -469,7 +469,7 @@ QueryResult *SQLExec::show_index(const ShowStatement *statement) {
     // handle memory leak
     delete handles;
 
-    return new QueryResult(name_keys, attribute_key, rows,
+    return new QueryResult(name_keys, attribute_keys, rows,
                            "successfully returned " + to_string(row_size) +
                            " rows");
 }
